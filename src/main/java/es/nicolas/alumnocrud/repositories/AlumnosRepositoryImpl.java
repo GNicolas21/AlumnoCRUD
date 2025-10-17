@@ -25,19 +25,39 @@ public class AlumnosRepositoryImpl implements AlumnosRepository {
 
     @Override
     public List<Alumno> findAll() {
+        log.info("Buscando alumnos");
         return alumnos.values().stream().toList();
     }
 
     @Override
-    public List<Alumno> findByNombre(String nombre) {
+    public List<Alumno> findAllByApellido(String apellido) {
+        log.info("Buscando alumnos por apellido: {}", apellido);
+        return alumnos.values().stream()
+                .filter(al -> al.getApellido().toLowerCase().contains(apellido.toLowerCase()))
+                .toList();
+    }
+
+    @Override
+    public List<Alumno> findAllByNombre(String nombre) {
+        log.info("Buscando alumnos por nombre: {}", nombre);
         return alumnos.values().stream()
                 .filter(al -> al.getNombre().toLowerCase().contains(nombre.toLowerCase()))
                 .toList();
     }
 
     @Override
-    public Optional<Alumno> findById(long id) {
+    public Optional<Alumno> findById(Long id) {
         // condicion ? valor si true : valor si false
+        log.info("Buscando alumnos por id: {}", id);
         return alumnos.get(id) != null ? Optional.of(alumnos.get(id)) : Optional.empty();
+    }
+
+    @Override
+    public List<Alumno> findAllByNombreAndApellido(String nombre, String apellido) {
+        log.info("Buscando alumnos por nombre: {} y apellido: {}", nombre, apellido);
+        return alumnos.values().stream()
+                .filter(al -> al.getNombre().toLowerCase().contains(nombre.toLowerCase()) &&
+                        al.getApellido().toLowerCase().contains(apellido.toLowerCase()))
+                .toList();
     }
 }

@@ -8,7 +8,13 @@ import java.util.Optional;
 public interface AlumnosRepository {
     List <Alumno> findAll();
 
-    List<Alumno> findByNombre(String nombre);
+    List<Alumno> findAllByNombre(String nombre);
 
-    Optional<Alumno> findById(long id);
+    List<Alumno> findAllByApellido(String apellido);
+
+    Optional<Alumno> findById(Long id);
+
+    List <Alumno> findAllByNombreAndApellido(String nombre, String apellido);
+
+
 }

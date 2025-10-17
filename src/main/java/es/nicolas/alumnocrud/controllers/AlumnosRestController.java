@@ -26,7 +26,7 @@ public class AlumnosRestController {
     @GetMapping
     public ResponseEntity<List<Alumno>> getAllAlumnos(@RequestParam(required = false) String nombre) {
         if (nombre != null) {
-            return  ResponseEntity.ok(alumnosRepository.findByNombre(nombre));
+            return  ResponseEntity.ok(alumnosRepository.findAllByNombre(nombre));
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(alumnosRepository.findAll());
         }
