@@ -45,6 +45,7 @@ public class AlumnosServiceImpl implements AlumnosService{
 
     @Override
     public Alumno findById(Long id) {
-        alumnosRepository.findById(id).orElse(null);
+        log.info("Buscando alumno por id: {}", id);
+        return alumnosRepository.findById(id).orElse(null);
     }
 }

@@ -5,4 +5,14 @@ GET https://examples.http-client.intellij.net/get
 ### GET request to example server
 GET http://localhost:3000/api/v1/alumnos
 
+### GET alumno by ID
+GET http://localhost:3000/api/v1/alumnos/4
 
+### GET alumno by Nombre
+GET http://localhost:3000/api/v1/alumnos?nombre=Bart
+
+### Por nombre Y apellido
+GET http://localhost:3000/api/v1/alumnos?nombre=Bart&apellido=Benavente
+
+### GET alumnos by Apellido
+GET http://localhost:3000/api/v1/alumnos?apellido=Delgado
