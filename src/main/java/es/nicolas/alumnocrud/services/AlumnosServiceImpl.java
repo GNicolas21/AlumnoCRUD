@@ -2,6 +2,7 @@ package es.nicolas.alumnocrud.services;
 
 import es.nicolas.alumnocrud.models.Alumno;
 import es.nicolas.alumnocrud.repositories.AlumnosRepository;
+import es.nicolas.exceptions.AlumnoNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,6 @@ public class AlumnosServiceImpl implements AlumnosService{
     @Override
     public Alumno findById(Long id) {
         log.info("Buscando alumno por id: {}", id);
-        return alumnosRepository.findById(id).orElse(null);
+        return alumnosRepository.findById(id).orElseThrow(() -> new AlumnoNotFoundException(id));
     }
 }

@@ -47,8 +47,8 @@ public class AlumnosRepositoryImpl implements AlumnosRepository {
 
     @Override
     public Optional<Alumno> findById(Long id) {
-        // condicion ? valor si true : valor si false
         log.info("Buscando alumnos por id: {}", id);
+        // condicion ? valor si true : valor si false
         return alumnos.get(id) != null ? Optional.of(alumnos.get(id)) : Optional.empty();
     }
 

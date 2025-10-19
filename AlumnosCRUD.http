@@ -16,3 +16,6 @@ GET http://localhost:3000/api/v1/alumnos?nombre=Bart&apellido=Benavente
 
 ### GET alumnos by Apellido
 GET http://localhost:3000/api/v1/alumnos?apellido=Delgado
+
+### GET alumnoById (que no existe)
+GET http://localhost:3000/api/v1/alumnos/9999
