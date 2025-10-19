@@ -19,3 +19,15 @@ GET http://localhost:3000/api/v1/alumnos?apellido=Delgado
 
 ### GET alumnoById (que no existe)
 GET http://localhost:3000/api/v1/alumnos/9999
+
+### Nuevo alumno
+POST http://localhost:3000/api/v1/alumnos
+Content-Type: application/json
+
+{
+  "nombre": "Ernesto",
+  "apellido": "Espinoza",
+  "grado": "E lemental"
+}
+### Delete alumno
+DELETE http://localhost:3000/api/v1/alumnos/1

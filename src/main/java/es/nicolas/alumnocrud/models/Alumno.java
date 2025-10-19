@@ -13,7 +13,7 @@ public class Alumno {
     private final String apellido;
     private final String grado;
 
-    private final LocalDateTime createAt;
-    private final LocalDateTime updateAt;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
     private final UUID uuid;
 }

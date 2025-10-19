@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.*;
 
 @Slf4j
@@ -59,5 +58,55 @@ public class AlumnosRepositoryImpl implements AlumnosRepository {
                 .filter(al -> al.getNombre().toLowerCase().contains(nombre.toLowerCase()) &&
                         al.getApellido().toLowerCase().contains(apellido.toLowerCase()))
                 .toList();
+    }
+
+
+    @Override
+    public Optional<Alumno> findByUuid(UUID uuid) {
+        log.info("Buscando alumno por uuid: {}", uuid);
+        return alumnos.values().stream()
+                .filter(al -> al.getUuid().equals(uuid))
+                .findFirst();
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        log.info("Comprobando si existe el alumno por id: {}", id);
+        return alumnos.get(id) != null;
+    }
+
+    @Override
+    public boolean existsByUUID(UUID uuid) {
+        log.info("Comprobando si existe el alumno por uuid: {}", uuid);
+        return alumnos.values().stream()
+                .anyMatch(al -> al.getUuid().equals(uuid));
+    }
+
+    @Override
+    public Alumno save(Alumno alumno) {
+        log.info("Guardando alumno: {}", alumno);
+        alumnos.put(alumno.getId(), alumno);
+        return alumno;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        log.info("Eliminando alumno por id: {}", id);
+        alumnos.remove(id);
+    }
+
+    @Override
+    public void deleteByUuid(UUID uuid) {
+        log.info("Eliminando alumno por uuid: {}", uuid);
+        alumnos.values().removeIf(al -> al.getUuid().equals(uuid));
+    }
+
+    @Override
+    public Long nextId() {
+        log.info("Obteniendo el siguiente id de alumno");
+        return alumnos.keySet().stream()
+                .mapToLong(v -> v)
+                .max()
+                .orElse(0L) + 1;
     }
 }

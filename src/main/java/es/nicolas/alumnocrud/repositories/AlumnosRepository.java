@@ -4,6 +4,7 @@ import es.nicolas.alumnocrud.models.Alumno;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface AlumnosRepository {
     List <Alumno> findAll();
@@ -12,9 +13,22 @@ public interface AlumnosRepository {
 
     List<Alumno> findAllByApellido(String apellido);
 
-    Optional<Alumno> findById(Long id);
-
     List <Alumno> findAllByNombreAndApellido(String nombre, String apellido);
 
+    Optional<Alumno> findById(Long id);
+
+    Optional<Alumno> findByUuid(UUID uuid);
+
+    boolean existsById(Long id);
+
+    boolean existsByUUID(UUID uuid);
+
+    Alumno save(Alumno alumno);
+
+    void deleteById(Long id);
+
+    void deleteByUuid(UUID uuid);
+
+    Long nextId();
 
 }
