@@ -2,32 +2,62 @@
 GET https://examples.http-client.intellij.net/get
     ?generated-in=IntelliJ IDEA
 
-### GET request to example server
+
+### GET allAlumnos
 GET http://localhost:3000/api/v1/alumnos
 
-### GET alumno by ID
+
+### GET alumnoById = 4
 GET http://localhost:3000/api/v1/alumnos/4
 
-### GET alumno by Nombre
+
+### GET alumnoByNombre
 GET http://localhost:3000/api/v1/alumnos?nombre=Bart
 
-### Por nombre Y apellido
-GET http://localhost:3000/api/v1/alumnos?nombre=Bart&apellido=Benavente
 
 ### GET alumnos by Apellido
 GET http://localhost:3000/api/v1/alumnos?apellido=Delgado
 
+
+### GET byNombreYApellido
+GET http://localhost:3000/api/v1/alumnos?nombre=Bart&apellido=Benavente
+
+
 ### GET alumnoById (que no existe)
 GET http://localhost:3000/api/v1/alumnos/9999
+
 
 ### Nuevo alumno
 POST http://localhost:3000/api/v1/alumnos
 Content-Type: application/json
 
 {
+  "nombre": "ErnErnestoErnestoErnesto",
+  "apellido": "Espinoza",
+  "grado": "3 lemental"
+}
+
+
+### Nuevo alumno que no cumple validaciones
+POST http://localhost:3000/api/v1/alumnos
+Content-Type: application/json
+
+{
+  "nombre": "ErnErnestoErnestoErnErnestoErnestoErnErnestoErnestoErnesto",
+  "apellido": null,
+  "grado": "3 lemental"
+}
+
+### Put alumno
+PUT http://localhost:3000/api/v1/alumnos/1
+Content-Type: application/json
+
+{
   "nombre": "Ernesto",
   "apellido": "Espinoza",
-  "grado": "E lemental"
+    "grado": null
 }
+
+
 ### Delete alumno
 DELETE http://localhost:3000/api/v1/alumnos/1

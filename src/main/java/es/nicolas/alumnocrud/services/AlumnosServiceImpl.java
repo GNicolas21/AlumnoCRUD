@@ -84,6 +84,7 @@ public class AlumnosServiceImpl implements AlumnosService{
     public AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto) {
         log.info("Guardando alumno: {}", alumnoCreateDto);
         // obtenemos el id del alumno
+
         Long id = alumnosRepository.nextId();
         //Creamos un nuevo alumno con los datos que nos vienen
         Alumno nuevoAlumno = alumnoMapper.toAlumno(id, alumnoCreateDto);

@@ -5,6 +5,7 @@ import es.nicolas.alumnocrud.dto.AlumnoCreateDto;
 import es.nicolas.alumnocrud.dto.AlumnoResponseDto;
 import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
 import es.nicolas.alumnocrud.services.AlumnosService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,7 +54,7 @@ public class AlumnosRestController {
 
     //Crear un nuevo alumnoCreateDto, pasado en el body como JSON, y devolver el alumno creado
     @PostMapping()
-    public ResponseEntity<AlumnoResponseDto> create(@RequestBody AlumnoCreateDto alumnoCreateDto){
+    public ResponseEntity<AlumnoResponseDto> create(@Valid @RequestBody AlumnoCreateDto alumnoCreateDto){
         log.info("Creando alumno: {}", alumnoCreateDto);
         var saved = alumnosService.save(alumnoCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -68,7 +69,7 @@ public class AlumnosRestController {
      * @throws /*AlumnoBadRequestException si los datos son inválidos (400)
      * */
     @PutMapping("/{id}")
-    public ResponseEntity<AlumnoResponseDto> update(@PathVariable long id, @RequestBody AlumnoUpdateDto alumnoUpdateDto) {
+    public ResponseEntity<AlumnoResponseDto> update(@PathVariable Long id,@Valid @RequestBody AlumnoUpdateDto alumnoUpdateDto) {
         log.info("Actualizando alumno con id: {} con alumno: {}", id, alumnoUpdateDto);
         return ResponseEntity.ok(alumnosService.update(id, alumnoUpdateDto));
     }
@@ -82,7 +83,7 @@ public class AlumnosRestController {
      * @throws /*AlumnoBadRequestException si los datos son inválidos (400)
      * */
     @PatchMapping("/{id}")
-    public ResponseEntity<AlumnoResponseDto> updatePartial(@PathVariable Long id, @RequestBody AlumnoUpdateDto alumnoUpdateDto){
+    public ResponseEntity<AlumnoResponseDto> updatePartial(@PathVariable Long id,@Valid @RequestBody AlumnoUpdateDto alumnoUpdateDto){
         log.info("Actualizando parcialmente alumno con id: {} con alumno: {}", id, alumnoUpdateDto);
         return ResponseEntity.ok(alumnosService.update(id, alumnoUpdateDto));
     }
@@ -113,6 +114,7 @@ public class AlumnosRestController {
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
         });
         return errors;
     }
