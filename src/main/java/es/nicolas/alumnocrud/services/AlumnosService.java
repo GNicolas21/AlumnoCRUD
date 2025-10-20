@@ -1,20 +1,22 @@
 package es.nicolas.alumnocrud.services;
 
-import es.nicolas.alumnocrud.models.Alumno;
+import es.nicolas.alumnocrud.dto.AlumnoCreateDto;
+import es.nicolas.alumnocrud.dto.AlumnoResponseDto;
+import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
 
 import java.util.List;
 
 public interface AlumnosService {
 
-    List<Alumno> findAll(String nombre, String apellido);
+    List<AlumnoResponseDto> findAll(String nombre, String apellido);
 
-    Alumno findById(Long id);
+    AlumnoResponseDto findById(Long id);
 
-    Alumno findByUuid(String uuid);
+    AlumnoResponseDto findByUuid(String uuid);
 
-    Alumno save(Alumno alumno);
+    AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto);
 
-    Alumno update(Long id, Alumno alumno);
+    AlumnoResponseDto update(Long id, AlumnoUpdateDto alumnoUpdateDto);
 
     void deleteById(Long id);
 

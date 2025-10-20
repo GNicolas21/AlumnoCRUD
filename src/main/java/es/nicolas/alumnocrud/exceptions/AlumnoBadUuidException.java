@@ -1,4 +1,4 @@
-package es.nicolas.exceptions;
+package es.nicolas.alumnocrud.exceptions;
 
 public class AlumnoBadUuidException extends AlumnoException{
     public AlumnoBadUuidException(String uuid){
