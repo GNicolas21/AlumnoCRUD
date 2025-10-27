@@ -6,10 +6,12 @@ import es.nicolas.alumnocrud.dto.AlumnoResponseDto;
 import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
 import es.nicolas.alumnocrud.services.AlumnosService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -19,22 +21,17 @@ import java.util.*;
 /**
  * Controlador de productos del tipo RestController
  * Fijamos la ruta de acceso a este controlador
- * Usamos el repositorio de productos y lo inyectamos en el constructor con Autowired
- * /*@Autowired es una anotación que nos permite inyectar dependencias basadas
+ * /*@RequiredArgsConstructor es una anotación Lombok que nos permite inyectar dependencias basadas
  * en las anotaciones @Controller, @Service, @Component, etc.
  * y que se encuentren en nuestro contenedor de Spring.
  */
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("api/${api.version}/alumnos")
 @RestController
 public class AlumnosRestController {
 
-    private final AlumnosService alumnosService;
-
-    @Autowired
-    public AlumnosRestController(AlumnosService alumnosService) {
-        this.alumnosService = alumnosService;
-    }
+    private final AlumnosService alumnosService; //Uso de la @Req.ArgsConst.
 
     //Obtener todos los alumno o filtrar por nombre y/o apellido
     @GetMapping()
@@ -108,15 +105,22 @@ public class AlumnosRestController {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
+    public ProblemDetail handleValidationExceptions(
             MethodArgumentNotValidException ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        BindingResult result = ex.getBindingResult();
+        problemDetail.setDetail("Fallos la validación del objeto= '" +
+                result.getObjectName() + "'." + " Núm. errores: " + result.getErrorCount());
+
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
+        result.getFieldErrors().forEach((error) -> {
             String errorMessage = error.getDefaultMessage();
+            String fieldName = ((FieldError) error).getField();
             errors.put(fieldName, errorMessage);
         });
-        return errors;
+        problemDetail.setProperty("errors", errors);
+        return problemDetail;
     }
 
 }

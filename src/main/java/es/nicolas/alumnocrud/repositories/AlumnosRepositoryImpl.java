@@ -13,12 +13,45 @@ public class AlumnosRepositoryImpl implements AlumnosRepository {
 
     private final Map<Long, Alumno> alumnos = new LinkedHashMap<>(
             Map.of(
-                    1L, new Alumno(1L, "Nicolas", "Osorio", "2 DAW", LocalDateTime.now(), LocalDateTime.now(), UUID.randomUUID()),
-                    2L, new Alumno(2L, "Bart", "Benavente", "8 DAM", LocalDateTime.now(), LocalDateTime.now(), UUID.randomUUID()),
-                    3L, new Alumno(3L, "Cesar", "Campos", "3 DAW", LocalDateTime.now(), LocalDateTime.now(), UUID.randomUUID()),
-                    4L, new Alumno(4L, "Dani", "Delgado", "4 ASIR", LocalDateTime.now(), LocalDateTime.now(), UUID.randomUUID())
+                    1L, Alumno.builder()
+                            .id(1L)
+                            .nombre("Nicolas")
+                            .apellido("Osorio")
+                            .grado("2 DAW")
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .uuid(UUID.randomUUID())
+                            .build(),
+                    2L, Alumno.builder()
+                            .id(2L)
+                            .nombre("Bart")
+                            .apellido("Benavente")
+                            .grado("8 DAM")
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .uuid(UUID.randomUUID())
+                            .build(),
+                    3L, Alumno.builder()
+                            .id(3L)
+                            .nombre("Cesar")
+                            .apellido("Campos")
+                            .grado("3 DAW")
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .uuid(UUID.randomUUID())
+                            .build(),
+                    4L, Alumno.builder()
+                            .id(4L)
+                            .nombre("Dani")
+                            .apellido("Delgado")
+                            .grado("4 ASIR")
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .uuid(UUID.randomUUID())
+                            .build()
             )
     );
+
 
 
 

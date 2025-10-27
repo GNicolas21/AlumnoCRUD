@@ -8,8 +8,8 @@ import es.nicolas.alumnocrud.models.Alumno;
 import es.nicolas.alumnocrud.repositories.AlumnosRepository;
 import es.nicolas.alumnocrud.exceptions.AlumnoBadUuidException;
 import es.nicolas.alumnocrud.exceptions.AlumnoNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 @CacheConfig(cacheNames = {"alumnos"})
 @Slf4j
 @Service
@@ -25,11 +26,6 @@ public class AlumnosServiceImpl implements AlumnosService{
     private final AlumnosRepository alumnosRepository;
     private final AlumnoMapper alumnoMapper;
 
-    @Autowired
-    public AlumnosServiceImpl(AlumnosRepository alumnosRepository, AlumnoMapper alumnoMapper) {
-        this.alumnosRepository = alumnosRepository;
-        this.alumnoMapper = alumnoMapper;
-    }
 
     @Override
     public List<AlumnoResponseDto> findAll(String nombre, String apellido) {

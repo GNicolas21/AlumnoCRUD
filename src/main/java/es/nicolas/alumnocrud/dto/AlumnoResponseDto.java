@@ -1,18 +1,21 @@
 package es.nicolas.alumnocrud.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Builder
 @Data
 public class AlumnoResponseDto {
-    private final Long id;
+    private Long id;
 
-    private final String nombre;
-    private final String apellido;
-    private final String grado;
+    private String nombre;
+    private String apellido;
+    private String grado;
 
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final String uuid;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private UUID uuid;
 }
