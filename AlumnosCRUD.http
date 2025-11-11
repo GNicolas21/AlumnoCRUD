@@ -7,8 +7,8 @@ GET https://examples.http-client.intellij.net/get
 GET http://localhost:3000/api/v1/alumnos
 
 
-### GET alumnoById = 4
-GET http://localhost:3000/api/v1/alumnos
+### GET alumnoById = 1
+GET http://localhost:3000/api/v1/alumnos/1
 
 
 ### GET alumnoByNombre

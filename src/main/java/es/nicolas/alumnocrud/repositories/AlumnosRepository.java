@@ -1,34 +1,24 @@
 package es.nicolas.alumnocrud.repositories;
 
 import es.nicolas.alumnocrud.models.Alumno;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AlumnosRepository {
-    List <Alumno> findAll();
+public interface AlumnosRepository extends JpaRepository<Alumno, Long> {
 
-    List<Alumno> findAllByNombre(String nombre);
+    List<Alumno> findByNombre(String nombre);
 
-    List<Alumno> findAllByApellido(String apellido);
+    List<Alumno> findByApellidoContainsIgnoreCase(String apellido);
 
-    List <Alumno> findAllByNombreAndApellido(String nombre, String apellido);
-
-    Optional<Alumno> findById(Long id);
+    List <Alumno> findByNombreAndApellidoContainsIgnoreCase(String nombre, String apellido);
 
     Optional<Alumno> findByUuid(UUID uuid);
 
-    boolean existsById(Long id);
-
-    boolean existsByUUID(UUID uuid);
-
-    Alumno save(Alumno alumno);
-
-    void deleteById(Long id);
+    boolean existsByUuid(UUID uuid);
 
     void deleteByUuid(UUID uuid);
-
-    Long nextId();
 
 }

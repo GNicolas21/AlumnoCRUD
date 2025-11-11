@@ -15,9 +15,8 @@ import java.util.UUID;
 @Component
 public class AlumnoMapper {
 
-    public Alumno toAlumno(Long id, AlumnoCreateDto alumnoCreateDto) {
+    public Alumno toAlumno(AlumnoCreateDto alumnoCreateDto) {
         return Alumno.builder()
-                .id(id)
                 .nombre(alumnoCreateDto.getNombre())
                 .apellido(alumnoCreateDto.getApellido())
                 .grado(alumnoCreateDto.getGrado())

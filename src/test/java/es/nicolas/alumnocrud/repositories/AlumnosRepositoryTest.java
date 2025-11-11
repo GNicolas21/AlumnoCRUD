@@ -1,8 +1,14 @@
 package es.nicolas.alumnocrud.repositories;
 
 import es.nicolas.alumnocrud.models.Alumno;
+import jakarta.persistence.EntityManager;
+import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -10,8 +16,10 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AlumnosRepositoryImplTest {
-    private AlumnosRepositoryImpl repository;
+@DataJpaTest
+class AlumnosRepositoryTest {
+    @Autowired
+    private AlumnosRepository repository;
 
     private final Alumno alumno1 = Alumno.builder()
             .id(1L)
@@ -20,7 +28,7 @@ class AlumnosRepositoryImplTest {
             .grado("2 DAW")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .uuid(UUID.randomUUID())
+            .uuid(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))
             .build();
     private final Alumno alumno2 = Alumno.builder()
             .id(2L)
@@ -50,14 +58,25 @@ class AlumnosRepositoryImplTest {
             .uuid(UUID.fromString("267ed00a-6c21-4c4a-8626-db28bcca7a26"))
             .build();
 
+
+    @Autowired
+    private TestEntityManager testEntityManager;
+
     // Esto se ejecuta antes de cada test
     @BeforeEach
     void setUp() {
-        repository =  new AlumnosRepositoryImpl();
-        repository.save(alumno1);
-        repository.save(alumno2);
-        repository.save(alumno3);
-        repository.save(alumno4);
+//        //Comandos JPA
+//        repository.save(alumno1);
+//        repository.save(alumno2);
+//        repository.save(alumno3);
+//        repository.save(alumno4);
+
+        //Comando EntityManager
+        testEntityManager.merge(alumno1);
+        testEntityManager.merge(alumno2);
+        testEntityManager.merge(alumno3);
+        testEntityManager.merge(alumno4);
+        testEntityManager.flush();
     }
 
 
@@ -74,10 +93,10 @@ class AlumnosRepositoryImplTest {
 
 
     @Test
-    void findAllByApellido() {
+    void findByApellidoContainsIgnoreCase() {
         // Act
         String apellido = "Osorio";
-        List<Alumno> alumnos = repository.findAllByApellido(apellido);
+        List<Alumno> alumnos = repository.findByApellidoContainsIgnoreCase(apellido);
         // Assert
         assertAll("findAllByApellido",
                 () -> assertNotNull(alumnos),
@@ -87,9 +106,9 @@ class AlumnosRepositoryImplTest {
     }
 
     @Test
-    void findAllByNombre() {
+    void findByNombre() {
         String nombre = "Gabriel";
-        List<Alumno> alumnos = repository.findAllByNombre(nombre);
+        List<Alumno> alumnos = repository.findByNombre(nombre);
         // Assert
         assertAll("findAllByNombre",
                 () -> assertNotNull(alumnos),
@@ -99,11 +118,11 @@ class AlumnosRepositoryImplTest {
     }
 
     @Test
-    void findAllByNombreAndApellido() {
+    void findByNombreAndApellidoContainsIgnoreCase() {
         // Act
         String nombre = "Nicolas";
         String apellido = "Osorio";
-        List<Alumno> tarjetas = repository.findAllByNombreAndApellido(nombre, apellido);
+        List<Alumno> tarjetas = repository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido);
         // Assert
         assertAll(
                 () -> assertNotNull(tarjetas),
@@ -142,7 +161,7 @@ class AlumnosRepositoryImplTest {
     @Test
     void findByUuid_existingUuid_returnsOptionalWithAlumno() {
         // Act
-        UUID uuid = UUID.fromString("267ed00a-6c21-4c4a-8626-db28bcca7a26");
+        UUID uuid = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
         Optional<Alumno> optionalAlumno = repository.findByUuid(uuid);
 
         // Assert
@@ -179,7 +198,7 @@ class AlumnosRepositoryImplTest {
     @Test
     void existsById_existingId_returnsFalse() {
         // Act
-        Long id = 999L;
+        Long id = 5L;
         boolean exists = repository.existsById(id);
 
         // Assert
@@ -190,7 +209,7 @@ class AlumnosRepositoryImplTest {
     void existsByUuid_existingUuid_returnsTrue() {
         // Act
         UUID uuid = UUID.fromString("267ed00a-6c21-4c4a-8626-db28bcca7a26");
-        boolean exists = repository.existsByUUID(uuid);
+        boolean exists = repository.existsByUuid(uuid);
 
         // Assert
         assertTrue(exists);
@@ -200,7 +219,7 @@ class AlumnosRepositoryImplTest {
     void existsByUuid_nonExistingUuid_returnsFalse() {
         // Act
         UUID uuid = UUID.fromString("12345bc2-0c1c-494e-bbaf-e952a778e478");
-        boolean exists = repository.existsByUUID(uuid);
+        boolean exists = repository.existsByUuid(uuid);
 
         // Assert
         assertFalse(exists);
@@ -235,20 +254,20 @@ class AlumnosRepositoryImplTest {
     @Test
     void save_butExists() {
         // Arrange
-        Alumno alumno = Alumno.builder()
-                .id(1L)
-                .build();
-
-        // Act
-        Alumno savedAlumno = repository.save(alumno);
-        var all = repository.findAll();
-
+        Alumno existingAlumno = alumno1;
+//        Alumno alumno = Alumno.builder()
+//                .id(1L)
+//                .build();
+//
+//        // Act
         // Assert
-        assertAll("save_butExists",
-                () -> assertNotNull(savedAlumno),
-                () ->  assertEquals(alumno, savedAlumno),
-                () -> assertEquals(4, all.size())
-        );
+        assertThrows(DataIntegrityViolationException.class, () -> repository.save(existingAlumno));
+
+//        assertAll("save_butExists",
+//                () -> assertNotNull(savedAlumno),
+//                () ->  assertEquals(alumno, savedAlumno),
+//                () -> assertEquals(4, all.size())
+//        );
     }
 
 
@@ -277,20 +296,19 @@ class AlumnosRepositoryImplTest {
         // Assert
         assertAll("deleteByUuid_existingUuid",
                 () -> assertEquals(3, all.size()),
-                () -> assertFalse(repository.existsByUUID(uuidToDelete))
+                () -> assertFalse(repository.existsByUuid(uuidToDelete))
         );
     }
 
 
     @Test
     void nextId() {
-        // Act
-        Long nextId = repository.nextId();
+//        // Act
+//        Long nextId = repository.nextId();
         var all = repository.findAll();
 
         // Assert
         assertAll("nextId",
-                () -> assertEquals(5L, nextId),
                 // Calcula el siguiente id, en este caso 5 pero no cambia
                 // el tamaño porque no lo añade a la lista repository
                 () -> assertEquals(4, all.size())

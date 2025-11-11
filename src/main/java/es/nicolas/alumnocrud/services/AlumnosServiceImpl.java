@@ -38,18 +38,18 @@ public class AlumnosServiceImpl implements AlumnosService{
         //Si el nombre no está vacío pero el apellido si, buscamos por nombre
         if((nombre != null && !nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
             log.info("Buscando alumnos por nombre: {}", nombre);
-            return alumnoMapper.toResponseDtoList(alumnosRepository.findAllByNombre(nombre));
+            return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombre(nombre));
         }
 
         //Si el apellido no está vacío pero el nombre si, buscamos por apellido
         if ((nombre == null || nombre.isEmpty())) {
             log.info("Buscando alumnos por apellido: {}", apellido);
-            return alumnoMapper.toResponseDtoList(alumnosRepository.findAllByApellido(apellido));
+            return alumnoMapper.toResponseDtoList(alumnosRepository.findByApellidoContainsIgnoreCase(apellido));
         }
 
         //Si el nombre y apellido no están vacíos, buscamos por ambos
         log.info("Buscando alumnos por nombre: {}", nombre + " y apellido: " + apellido);
-        return alumnoMapper.toResponseDtoList(alumnosRepository.findAllByNombreAndApellido(nombre, apellido));
+        return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido));
     }
 
     // Cachea con el id como key
@@ -79,11 +79,8 @@ public class AlumnosServiceImpl implements AlumnosService{
     @Override
     public AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto) {
         log.info("Guardando alumno: {}", alumnoCreateDto);
-        // obtenemos el id del alumno
-
-        Long id = alumnosRepository.nextId();
         //Creamos un nuevo alumno con los datos que nos vienen
-        Alumno nuevoAlumno = alumnoMapper.toAlumno(id, alumnoCreateDto);
+        Alumno nuevoAlumno = alumnoMapper.toAlumno(alumnoCreateDto);
         // La guardamos en el repositorio
         return alumnoMapper.toAlumnoResponseDto(alumnosRepository.save(nuevoAlumno));
     }
