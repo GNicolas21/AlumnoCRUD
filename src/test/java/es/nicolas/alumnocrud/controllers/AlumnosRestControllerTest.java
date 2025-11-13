@@ -2,6 +2,7 @@ package es.nicolas.alumnocrud.controllers;
 
 import es.nicolas.alumnocrud.dto.AlumnoCreateDto;
 import es.nicolas.alumnocrud.dto.AlumnoResponseDto;
+import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
 import es.nicolas.alumnocrud.exceptions.AlumnoNotFoundException;
 import es.nicolas.alumnocrud.services.AlumnosService;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.http.MediaType;
 
@@ -16,7 +18,7 @@ import org.springframework.http.MediaType;
 
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -41,7 +43,7 @@ class AlumnosRestControllerTest {
     @Autowired
     private MockMvcTester mockMvcTester;
 
-    @Autowired
+    @MockitoBean
     private AlumnosService alumnosService;
 
     @Test
@@ -75,7 +77,7 @@ class AlumnosRestControllerTest {
     void getAllByNombre(){
         // Arrange
         var alumnoResponses = List.of(alumnoResponse2);
-        String queryString = "?nombre= " + alumnoResponse2.getNombre();
+        String queryString = "?nombre=" + alumnoResponse2.getNombre();
         when(alumnosService.findAll(anyString(), isNull())).thenReturn(alumnoResponses);
 
         // Act. Consultar el endpoint
@@ -235,14 +237,15 @@ class AlumnosRestControllerTest {
         verify(alumnosService, only()).save(any(AlumnoCreateDto.class));
     }
 
+
     @Test
     void createWhenBadRequest() {
         // Arrange
         String requestBody = """
                 {
-                    "nombre": "",
-                    "apellido": "Bautista",
-                    "grado": "3 DAW"
+                    "nombre": "Nicolas",
+                    "apellido": "",
+                    "grado": "DAW 2"
                 }
                 """;
 
@@ -257,10 +260,8 @@ class AlumnosRestControllerTest {
         assertThat(result)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
-                        .hasPathSatisfying("$.errores", path -> {
-                            assertThat(path).hasFieldOrProperty("nombre");
+                        .hasPathSatisfying("$.errors", path -> {
                             assertThat(path).hasFieldOrProperty("apellido");
-                            assertThat(path).hasFieldOrProperty("grado");
                         });
 
         // Verify
@@ -270,14 +271,149 @@ class AlumnosRestControllerTest {
 
     @Test
     void update() {
+        // Arrange
+        Long id = 1L;
+        String requestBody = """
+                {
+                "grado": "4 DAW"
+                }
+                """;
 
+        var alumnoSaved = AlumnoResponseDto.builder()
+                .id(1L)
+                .nombre("Nicolas")
+                .apellido("Osorio")
+                .grado("4 DAW")
+                .build();
+
+        when(alumnosService.update(anyLong(), any(AlumnoUpdateDto.class))).thenReturn(alumnoSaved);
+
+        // Act
+        var result = mockMvcTester.put()
+                .uri(ENDPOINT + "/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        // Assert
+        assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(AlumnoResponseDto.class)
+                .isEqualTo(alumnoSaved);
+
+        // Verify
+        verify(alumnosService, only()).update(anyLong(), any(AlumnoUpdateDto.class));
+    }
+
+    @Test
+    void update_shouldthrowAlumnoNotFound_whenInvalidIdProvided() {
+        // Arrange
+        Long id = 5L;
+        String requestBody = """
+                {
+                "grado": "4 DAW"
+                }
+                """;
+
+        when(alumnosService.update(anyLong(), any(AlumnoUpdateDto.class)))
+                .thenThrow(new AlumnoNotFoundException(id));
+
+        // Act
+        var result = mockMvcTester.put()
+                .uri(ENDPOINT + "/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        // Assert
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                // throws AlumnoNotFoundException
+                .hasFailed().failure()
+                .isInstanceOf(AlumnoNotFoundException.class)
+                .hasMessageContaining("Alumno con id " + id + " no encontrado.");
+
+        // Verify
+        verify(alumnosService, only()).update(anyLong(), any());
     }
 
     @Test
     void updatePartial() {
+        // Arrange
+        Long id = 1L;
+        String requestBody = """
+                {
+                "grado": "4 DAW"
+                }
+                """;
+
+        var alumnoSaved = AlumnoResponseDto.builder()
+                .id(1L)
+                .nombre("Nicolas")
+                .apellido("Osorio")
+                .grado("4 DAW")
+                .build();
+
+        when(alumnosService.update(anyLong(), any(AlumnoUpdateDto.class))).thenReturn(alumnoSaved);
+
+        // Act
+        var result = mockMvcTester.patch()
+                .uri(ENDPOINT + "/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        // Assert
+        assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(AlumnoResponseDto.class)
+                .isEqualTo(alumnoSaved);
+
+        // Verify
+        verify(alumnosService, only()).update(anyLong(), any(AlumnoUpdateDto.class));
     }
 
     @Test
-    void delete() {
+    void delete(){
+        // Arrange
+        Long id = 1L;
+        doNothing().when(alumnosService).deleteById(anyLong());
+
+        // Act
+        var result = mockMvcTester.delete()
+                .uri(ENDPOINT + "/" + id)
+                .exchange();
+
+        // Assert
+        assertThat(result)
+                .hasStatus(HttpStatus.NO_CONTENT);
+
+        // Verify
+        verify(alumnosService, only()).deleteById(anyLong());
+    }
+
+    @Test
+    void delete_shouldThrowAlumnoNotFound_whenInvalidIdProvided(){
+        // Arrange
+        Long id = 3L;
+        doThrow(new AlumnoNotFoundException(id)).when(alumnosService).deleteById(anyLong());
+
+        // Act
+        var result = mockMvcTester.delete()
+                .uri(ENDPOINT + "/" + id)
+                .exchange();
+
+        // Assert
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                // throws AlumnoNotFoundException
+                .hasFailed().failure()
+                .isInstanceOf(AlumnoNotFoundException.class)
+                .hasMessageContaining("Alumno con id " + id + " no encontrado.");
+
+        // Verify
+        verify(alumnosService, only()).deleteById(anyLong());
     }
 }

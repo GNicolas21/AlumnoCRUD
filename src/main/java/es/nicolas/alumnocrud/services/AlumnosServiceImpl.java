@@ -26,7 +26,6 @@ public class AlumnosServiceImpl implements AlumnosService{
     private final AlumnosRepository alumnosRepository;
     private final AlumnoMapper alumnoMapper;
 
-
     @Override
     public List<AlumnoResponseDto> findAll(String nombre, String apellido) {
         //Si todos los args están vacios o nulos, devolvemos todos los alumnos
