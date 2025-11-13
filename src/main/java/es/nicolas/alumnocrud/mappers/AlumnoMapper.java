@@ -4,14 +4,12 @@ import es.nicolas.alumnocrud.dto.AlumnoCreateDto;
 import es.nicolas.alumnocrud.dto.AlumnoResponseDto;
 import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
 import es.nicolas.alumnocrud.models.Alumno;
-import lombok.Builder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
 @Component
 public class AlumnoMapper {
 

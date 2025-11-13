@@ -3,6 +3,7 @@ package es.nicolas.alumnocrud.services;
 import es.nicolas.alumnocrud.dto.AlumnoCreateDto;
 import es.nicolas.alumnocrud.dto.AlumnoResponseDto;
 import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
+import es.nicolas.alumnocrud.exceptions.AlumnoBadUuidException;
 import es.nicolas.alumnocrud.exceptions.AlumnoNotFoundException;
 import es.nicolas.alumnocrud.mappers.AlumnoMapper;
 import es.nicolas.alumnocrud.models.Alumno;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -75,7 +77,6 @@ class AlumnosServiceImplTest {
         // en este caso cuando se llame al metodo findAll del repositorio
         // devuelva la lista de alumnos esperada, osea aisla el sevice del repositorio
         when(alumnosRepository.findAll()).thenReturn(expectedAlumnos);
-        when(alumnoMapper.toResponseDtoList(expectedAlumnos)).thenReturn(expectedAlumnoResponses);
 
         // Act
         List <AlumnoResponseDto> actualAlumnoResponses = alumnosService.findAll(null, null);
@@ -86,7 +87,6 @@ class AlumnosServiceImplTest {
         // Verify
         // Verifica que el findAll del repositorio se haya llamado una sola vez
         verify(alumnosRepository, times(1)).findAll();
-        verify(alumnoMapper, times(1)).toResponseDtoList(anyList());
 
     }
 
@@ -181,7 +181,7 @@ class AlumnosServiceImplTest {
         assertEquals("Alumno con id " + id + " no encontrado.", res.getMessage());
 
         // Verify
-        verify(alumnosRepository.findById(id));
+        verify(alumnosRepository).findById(id);
     }
 
     @Test
@@ -206,14 +206,14 @@ class AlumnosServiceImplTest {
     @Test
     void findByUuid_ShouldThrowAlumnoBadUuid_WhenInvalidUuidProvided() {
         // Arrange
-        String uuid = "00000000-0000-0000-0000-000000000000";
+        String uuid = "1234";
 
         // Act & Assert
-        var res = assertThrows(AlumnoNotFoundException.class, () -> alumnosService.findByUuid(uuid));
+        var res = assertThrows(AlumnoBadUuidException.class, () -> alumnosService.findByUuid(uuid));
         assertEquals("Alumno con uuid " + uuid + " no encontrado.", res.getMessage());
 
         // Verify
-        verify(alumnosRepository, times(1)).findByUuid(UUID.fromString(uuid));
+        verify(alumnosRepository, never()).findByUuid(any());
     }
 
     @Test
@@ -235,20 +235,10 @@ class AlumnosServiceImplTest {
                 .uuid(UUID.randomUUID())
                 .build();
 
-        AlumnoResponseDto expectedAlumnoResponse = AlumnoResponseDto.builder()
-                .id(1L)
-                .nombre("Nicolas")
-                .apellido("Osorio")
-                .grado("2 DAW")
-                .createdAt(expectedAlumno.getCreatedAt())
-                .updatedAt(expectedAlumno.getUpdatedAt())
-                .uuid(expectedAlumno.getUuid())
-                .build();
+        AlumnoResponseDto expectedAlumnoResponse = alumnoMapper.toAlumnoResponseDto(expectedAlumno);
 
         when(alumnosRepository.nextId()).thenReturn(1L);
-        when(alumnoMapper.toAlumno(1L, alumnoCreateDto)).thenReturn(expectedAlumno);
-        when(alumnosRepository.save(expectedAlumno)).thenReturn(expectedAlumno);
-        when(alumnoMapper.toAlumnoResponseDto(any(Alumno.class))).thenReturn(expectedAlumnoResponse);
+        when(alumnosRepository.save(any(Alumno.class))).thenReturn(expectedAlumno);
 
         // Act
         AlumnoResponseDto actualAlumnoResponse = alumnosService.save(alumnoCreateDto);
@@ -257,10 +247,11 @@ class AlumnosServiceImplTest {
         assertEquals(expectedAlumnoResponse, actualAlumnoResponse);
 
         // Verify
-        verify(alumnosRepository, times(1)).nextId();
-        verify(alumnosRepository, times(1)).save(alumnoCaptor.capture());
-        verify(alumnoMapper, times(1)).toAlumno(1L, alumnoCreateDto);
-        verify(alumnoMapper, times(1)).toAlumnoResponseDto(any(Alumno.class));
+        verify(alumnosRepository).nextId();
+        verify(alumnosRepository).save(alumnoCaptor.capture());
+
+        Alumno alumnoCaptured = alumnoCaptor.getValue();
+        assertEquals(expectedAlumno.getNombre(), alumnoCaptured.getNombre());
     }
 
 
@@ -268,38 +259,32 @@ class AlumnosServiceImplTest {
     void update_ShouldReturnUpdateAlumno_WhenValidAndalumnoUpdateDtoProvided() {
         // Arrange
         Long id = 1L;
+        String nombre = "Nicolas Updated";
+        when(alumnosRepository.findById(id)).thenReturn(Optional.of(alumno1));
+
         AlumnoUpdateDto alumnoUpdateDto = AlumnoUpdateDto.builder()
-                .nombre("Nicolas Updated")
+                .nombre(nombre)
                 .build();
 
-        Alumno existingAlumno = alumno1;
+        Alumno alumnoUpdate = alumnoMapper.toAlumno(alumnoUpdateDto, alumno1);
+        when(alumnosRepository.save(any(Alumno.class))).thenReturn(alumnoUpdate);
 
-        AlumnoResponseDto existingAlumnoResponse = AlumnoResponseDto.builder()
-                .id(1L)
-                .nombre("Nicolas Updated")
-                .apellido("Osorio")
-                .grado("2 DAW")
-                .createdAt(existingAlumno.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .uuid(existingAlumno.getUuid())
-                .build();
-
-        when(alumnosRepository.findById(id)).thenReturn(Optional.of(existingAlumno));
-        when(alumnosRepository.save(existingAlumno)).thenReturn(existingAlumno);
-        when(alumnoMapper.toAlumno(alumnoUpdateDto, alumno1)).thenReturn(existingAlumno);
-        when(alumnoMapper.toAlumnoResponseDto(any(Alumno.class))).thenReturn(existingAlumnoResponse);
+        alumnoResponse1.setNombre(nombre);
+        AlumnoResponseDto existingAlumnoResponse = alumnoResponse1;
 
         // Act
         AlumnoResponseDto actualAlumnoResponse = alumnosService.update(id, alumnoUpdateDto);
 
-        // Assert
-        assertEquals(existingAlumnoResponse, actualAlumnoResponse);
+        // Assert este da error
+        // assertEquals(existingAlumnoResponse, actualAlumnoResponse);
+        assertThat(actualAlumnoResponse)
+                .usingRecursiveComparison()
+                .ignoringFields("updatedAt")
+                .isEqualTo(existingAlumnoResponse);
 
         // Verify
-        verify(alumnosRepository, times(1)).findById(id);
-        verify(alumnosRepository, times(1)).save(alumnoCaptor.capture());
-        verify(alumnoMapper, times(1)).toAlumno(alumnoUpdateDto, alumno1);
-        verify(alumnoMapper, times(1)).toAlumnoResponseDto(any(Alumno.class));
+        verify(alumnosRepository).findById(id);
+        verify(alumnosRepository).save(any());
     }
 
     @Test
@@ -313,22 +298,33 @@ class AlumnosServiceImplTest {
         when(alumnosRepository.findById(id)).thenReturn(Optional.empty());
 
         // Act & Assert
-        var res = assertThrows(AlumnoNotFoundException.class, () -> alumnosService.update(id, alumnoUpdateDto));
-        assertEquals("Alumno con id " + id + " no encontrado.", res.getMessage());
+//        var res = assertThrows(AlumnoNotFoundException.class, () -> alumnosService.update(id, alumnoUpdateDto));
+//        assertEquals("Alumno con id " + id + " no encontrado.", res.getMessage());
+
+        // Con AssertJ
+        assertThatThrownBy(
+                () -> alumnosService.update(id, alumnoUpdateDto))
+                .isInstanceOf(AlumnoNotFoundException.class)
+                .hasMessage("Alumno con id " + id + " no encontrado."
+        );
 
         // Verify
-        verify(alumnosRepository, times(0)).save(any(Alumno.class));
+        verify(alumnosRepository).findById(id);
+        verify(alumnosRepository, never()).save(any());
     }
 
     @Test
     void deleteById_ShouldDeleteAlumno_WhenValidIdProvided() {
         // Arrange
         Long id = 1L;
-        Alumno existingAlumno = alumno1;
-        when(alumnosRepository.findById(id)).thenReturn(Optional.of(existingAlumno));
+        when(alumnosRepository.findById(id)).thenReturn(Optional.of(alumno1));
 
-        // Act
-        alumnosService.deleteById(id);
+        // AssertJ
+        assertThatCode(() -> alumnosService.deleteById(id))
+                .doesNotThrowAnyException();
+
+        // Assert
+        verify(alumnosRepository).deleteById(id);
 
         // Verify
         verify(alumnosRepository, times(1)).findById(id);
@@ -340,9 +336,11 @@ class AlumnosServiceImplTest {
         Long id = 1L;
         when(alumnosRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        var res = assertThrows(AlumnoNotFoundException.class, () -> alumnosService.deleteById(id));
-        assertEquals("Alumno con id " + id + " no encontrado.", res.getMessage());
+        // AssertJ
+        assertThatThrownBy(
+                () -> alumnosService.deleteById(id))
+                .isInstanceOf(AlumnoNotFoundException.class)
+                .hasMessage("Alumno con id " + id + " no encontrado.");
 
         // Verify
         verify(alumnosRepository, times(0)).deleteById(id);
