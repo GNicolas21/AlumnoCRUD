@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class AlumnosRepositoryTest {
     @Autowired
     private AlumnosRepository repository;
+    @Autowired
+    private TestEntityManager testEntityManager;
 
     private final Alumno alumno1 = Alumno.builder()
             .id(1L)
@@ -59,10 +61,8 @@ class AlumnosRepositoryTest {
             .build();
 
 
-    @Autowired
-    private TestEntityManager testEntityManager;
-
     // Esto se ejecuta antes de cada test
+
     @BeforeEach
     void setUp() {
 //        //Comandos JPA

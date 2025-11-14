@@ -16,7 +16,7 @@ import java.util.UUID;
 // Y no es recomendable usar @Data
 @Entity
 // Si no se especifica, el nombre de la tabla será el mismo que el de la clase
-@Table(name = "ALUMNOS")
+@Table(name="ALUMNOS")
 public class Alumno {
     // Indica que este campo es la clave primaria de la entidad
     @Id
@@ -24,7 +24,6 @@ public class Alumno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     // Por defecto, los campos son obligatorios (nullable = true)
-    //
     @Column(nullable = false, length = 30)
     private String nombre;
     @Column(nullable = false, length = 30)
@@ -41,6 +40,6 @@ public class Alumno {
 
     // Nueva columna
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
-    //@Builder.Default
+    @Builder.Default
     private boolean isDeleted = false;
 }

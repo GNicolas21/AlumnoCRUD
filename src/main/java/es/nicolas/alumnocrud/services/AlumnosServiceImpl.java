@@ -26,10 +26,9 @@ public class AlumnosServiceImpl implements AlumnosService{
     private final AlumnosRepository alumnosRepository;
     private final AlumnoMapper alumnoMapper;
 
-
     @Override
     public List<AlumnoResponseDto> findAll(String nombre, String apellido) {
-        //Si está vacio o nulo, devolvemos todos los alumnos
+        //Si todos los args están vacios o nulos, devolvemos todos los alumnos
         if ((nombre == null || nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
             log.info("Buscando todos los alumnos");
             return alumnoMapper.toResponseDtoList(alumnosRepository.findAll());
@@ -61,7 +60,8 @@ public class AlumnosServiceImpl implements AlumnosService{
                 .orElseThrow(() -> new AlumnoNotFoundException(id)));
     }
 
-    @Cacheable(key = "#id")
+    // Cachea con el uuid como key
+    @Cacheable(key = "#uuid")
     @Override
     public AlumnoResponseDto findByUuid(String uuid) {
         log.info("Buscando alumno por uuid: {}", uuid);

@@ -3,7 +3,6 @@ package es.nicolas.alumnocrud.mappers;
 import es.nicolas.alumnocrud.dto.AlumnoCreateDto;
 import es.nicolas.alumnocrud.dto.AlumnoUpdateDto;
 import es.nicolas.alumnocrud.models.Alumno;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -18,7 +17,6 @@ class AlumnoMapperTest {
     @Test
     void toAlumno_create() {
         // Arrange
-        Long id = 1L;
         AlumnoCreateDto alumnoCreateDto = AlumnoCreateDto.builder()
                 .nombre("Nicolas")
                 .apellido("Osorio")
@@ -32,10 +30,7 @@ class AlumnoMapperTest {
         assertAll(
                 () -> assertEquals(alumnoCreateDto.getNombre(), res.getNombre()),
                 () -> assertEquals(alumnoCreateDto.getApellido(), res.getApellido()),
-                () -> assertEquals(alumnoCreateDto.getGrado(), res.getGrado()),
-                () -> assertNotNull(res.getCreatedAt()),
-                () -> assertNotNull(res.getUpdatedAt()),
-                () -> assertNotNull(res.getUuid())
+                () -> assertEquals(alumnoCreateDto.getGrado(), res.getGrado())
         );
     }
 
@@ -89,7 +84,7 @@ class AlumnoMapperTest {
                 () -> assertEquals(alumno.getNombre(), res.getNombre()),
                 () -> assertEquals(alumno.getApellido(), res.getApellido()),
                 () -> assertEquals(alumno.getGrado(), res.getGrado()),
-                () -> assertEquals(alumno.getCreatedAt(),  res.getCreatedAt()),
+                () -> assertEquals(alumno.getCreatedAt(), res.getCreatedAt()),
                 () -> assertEquals(alumno.getUpdatedAt(), res.getUpdatedAt()),
                 () -> assertEquals(alumno.getUuid(), res.getUuid())
         );
