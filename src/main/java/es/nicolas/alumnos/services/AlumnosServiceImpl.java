@@ -82,7 +82,7 @@ public class AlumnosServiceImpl implements AlumnosService{
     public AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto) {
         log.info("Guardando alumno: {}", alumnoCreateDto);
         //Creamos un nuevo alumno con los datos que nos vienen
-        var asignatura = asignaturaService.findByNombre(alumnoCreateDto.getNombre());
+        var asignatura = asignaturaService.findByNombre(alumnoCreateDto.getAsignatura());
         Alumno nuevoAlumno = alumnoMapper.toAlumno(alumnoCreateDto, asignatura);
         // La guardamos en el repositorio
         return alumnoMapper.toAlumnoResponseDto(alumnosRepository.save(nuevoAlumno));

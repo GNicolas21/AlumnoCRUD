@@ -14,8 +14,10 @@ create table ALUMNOS (
 );
 */
 
-insert into asignaturas (nombre)
-        values ('Programacion'), ('Base Datos'), ('Lenguaje Marcas');
+insert into asignaturas (nombre, duracionhoras)
+        values ('Programacion', 330);
+insert into asignaturas (nombre, duracionhoras)
+    values ('Base Datos', 270);
 
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
         values ('Nicolas', 'Osorio', '2 DAW', '1', '550e8400-e29b-41d4-a716-446655440000');
@@ -24,4 +26,4 @@ insert into alumnos (nombre, apellido, grado,asignatura_id, uuid)
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
         values ('Cesar', 'Campos', '3 DAW','2', '550e8400-e29b-41d4-a716-446655440002');
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-        values ('Dani', 'Delgado', '4 ASIR', '3', '550e8400-e29b-41d4-a716-446655440003');
+        values ('Dani', 'Delgado', '4 ASIR', '2', '550e8400-e29b-41d4-a716-446655440003');

@@ -34,7 +34,8 @@ Content-Type: application/json
 {
   "nombre": "Ernesto",
   "apellido": "Espinoza",
-  "grado": "3 lemental"
+  "grado": "3 lemental",
+  "asignatura": "Programacion"
 }
 
 

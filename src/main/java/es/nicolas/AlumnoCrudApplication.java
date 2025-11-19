@@ -5,10 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @EnableCaching
-@SpringBootApplication(scanBasePackages = {
-        "es.nicolas.alumnos",
-        "es.nicolas.asignaturas"
-})
+@SpringBootApplication
 public class AlumnoCrudApplication {
 
     static void main(String[] args) {

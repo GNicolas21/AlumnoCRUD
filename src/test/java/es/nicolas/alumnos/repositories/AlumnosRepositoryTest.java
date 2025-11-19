@@ -1,12 +1,14 @@
 package es.nicolas.alumnos.repositories;
 
 import es.nicolas.alumnos.models.Alumno;
+import es.nicolas.asignaturas.models.Asignatura;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -14,6 +16,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// Ejecuta el script SQL antes de cada método de prueba
+@Sql(value = {"/reset.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @DataJpaTest
 class AlumnosRepositoryTest {
     @Autowired
@@ -22,7 +26,6 @@ class AlumnosRepositoryTest {
     private TestEntityManager testEntityManager;
 
     private final Alumno alumno1 = Alumno.builder()
-            .id(1L)
             .nombre("Nicolas")
             .apellido("Osorio")
             .grado("2 DAW")
@@ -31,7 +34,6 @@ class AlumnosRepositoryTest {
             .uuid(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))
             .build();
     private final Alumno alumno2 = Alumno.builder()
-            .id(2L)
             .nombre("Gabriel")
             .apellido("Bauti")
             .grado("3 DAW")
@@ -40,7 +42,6 @@ class AlumnosRepositoryTest {
             .uuid(UUID.randomUUID())
             .build();
     private final Alumno alumno3 = Alumno.builder()
-            .id(3L)
             .nombre("Cesar")
             .apellido("Campos")
             .grado("3 DAW")
@@ -49,7 +50,6 @@ class AlumnosRepositoryTest {
             .uuid(UUID.randomUUID())
             .build();
     private final Alumno alumno4 = Alumno.builder()
-            .id(4L)
             .nombre("Dani")
             .apellido("Delgado")
             .grado("4 ASIR")
@@ -228,10 +228,13 @@ class AlumnosRepositoryTest {
     void save_notExists() {
         // Arrange
         Alumno alumno = Alumno.builder()
-                .id(5L)
                 .nombre("Laura")
                 .apellido("Martinez")
                 .grado("1 DAW")
+                .asignatura(Asignatura.builder()
+                        .id(1L)
+                        .nombre("Programacion")
+                        .build())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .uuid(UUID.randomUUID())

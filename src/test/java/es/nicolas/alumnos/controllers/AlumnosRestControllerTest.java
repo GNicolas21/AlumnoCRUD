@@ -206,7 +206,8 @@ class AlumnosRestControllerTest {
                 {
                     "nombre": "Giorgio",
                     "apellido": "Bautista",
-                    "grado": "3 DAW"
+                    "grado": "3 DAW",
+                    "asignatura": "Matematicas"
                 }
                 """;
 
@@ -214,7 +215,8 @@ class AlumnosRestControllerTest {
                 .id(1L)
                 .nombre("Giorgio")
                 .apellido("Bautista")
-                .grado("4 DAW")
+                .grado("3 DAW")
+                .asignatura("Matematicas")
                 .build();
 
         when(alumnosService.save(any(AlumnoCreateDto.class))).thenReturn(alumnoSaved);

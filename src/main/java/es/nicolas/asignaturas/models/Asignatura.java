@@ -24,7 +24,7 @@ public class Asignatura {
     @Column(unique = true, nullable = false, length = 20)
     private String nombre;
 
-    @Column(nullable = true, length = 3)
+    @Column(name = "duracionhoras", nullable = false)
     private Integer duracionHoras;
 
     @Builder.Default

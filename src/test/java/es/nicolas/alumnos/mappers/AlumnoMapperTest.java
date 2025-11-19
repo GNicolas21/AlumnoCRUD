@@ -3,6 +3,7 @@ package es.nicolas.alumnos.mappers;
 import es.nicolas.alumnos.dto.AlumnoCreateDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
 import es.nicolas.alumnos.models.Alumno;
+import es.nicolas.asignaturas.models.Asignatura;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -23,14 +24,20 @@ class AlumnoMapperTest {
                 .grado("2 DAW")
                 .build();
 
+        Asignatura asignatura = Asignatura.builder()
+                .id(1L)
+                .nombre("Matematicas")
+                .build();
+
         // Act
-        var res = alumnoMapper.toAlumno(alumnoCreateDto);
+        var res = alumnoMapper.toAlumno(alumnoCreateDto, asignatura);
 
         // Assert
         assertAll(
                 () -> assertEquals(alumnoCreateDto.getNombre(), res.getNombre()),
                 () -> assertEquals(alumnoCreateDto.getApellido(), res.getApellido()),
-                () -> assertEquals(alumnoCreateDto.getGrado(), res.getGrado())
+                () -> assertEquals(alumnoCreateDto.getGrado(), res.getGrado()),
+                () -> assertEquals(asignatura, res.getAsignatura())
         );
     }
 
@@ -71,6 +78,7 @@ class AlumnoMapperTest {
                 .nombre("Nicolas")
                 .apellido("Osorio")
                 .grado("2 DAW")
+                .asignatura(Asignatura.builder().id(1L).nombre("Matematicas").build())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .uuid(java.util.UUID.randomUUID())
@@ -84,6 +92,7 @@ class AlumnoMapperTest {
                 () -> assertEquals(alumno.getNombre(), res.getNombre()),
                 () -> assertEquals(alumno.getApellido(), res.getApellido()),
                 () -> assertEquals(alumno.getGrado(), res.getGrado()),
+                () -> assertEquals(alumno.getAsignatura().getNombre(), res.getAsignatura()),
                 () -> assertEquals(alumno.getCreatedAt(), res.getCreatedAt()),
                 () -> assertEquals(alumno.getUpdatedAt(), res.getUpdatedAt()),
                 () -> assertEquals(alumno.getUuid(), res.getUuid())

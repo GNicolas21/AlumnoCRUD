@@ -8,6 +8,8 @@ import es.nicolas.alumnos.exceptions.AlumnoNotFoundException;
 import es.nicolas.alumnos.mappers.AlumnoMapper;
 import es.nicolas.alumnos.models.Alumno;
 import es.nicolas.alumnos.repositories.AlumnosRepository;
+import es.nicolas.asignaturas.models.Asignatura;
+import es.nicolas.asignaturas.services.AsignaturaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +31,10 @@ class AlumnosServiceImplTest {
             .nombre("Nicolas")
             .apellido("Osorio")
             .grado("2 DAW")
+            .asignatura(Asignatura.builder()
+                    .id(1L)
+                    .nombre("Matematicas")
+                    .build())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .uuid(UUID.fromString("267ed00a-6c21-4c4a-8626-db28bcca7a26"))
@@ -38,6 +44,10 @@ class AlumnosServiceImplTest {
             .nombre("Gabriel")
             .apellido("Bauti")
             .grado("3 DAW")
+            .asignatura(Asignatura.builder()
+                    .id(2L)
+                    .nombre("Lengua")
+                    .build())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .uuid(UUID.fromString("367ed00a-6c21-4c4a-8626-db28bcca7a27"))
@@ -56,6 +66,10 @@ class AlumnosServiceImplTest {
     // Es la clase que se testea y a la que se le inyectan los mocks y spies automaticamente
     @InjectMocks
     private AlumnosServiceImpl alumnosService;
+
+    // Mock de AsignaturaService para inyectarlo en AlumnosServiceImpl
+    @Mock
+    private AsignaturaService asignaturaService;
 
     // Captor de argumentos
     // El captor es para que comprueba que los argumentos
@@ -223,6 +237,7 @@ class AlumnosServiceImplTest {
                 .nombre("Nicolas")
                 .apellido("Osorio")
                 .grado("2 DAW")
+                .asignatura("Matematicas")
                 .build();
 
         Alumno expectedAlumno = Alumno.builder()
@@ -230,14 +245,36 @@ class AlumnosServiceImplTest {
                 .nombre("Nicolas")
                 .apellido("Osorio")
                 .grado("2 DAW")
+                .asignatura(Asignatura.builder()
+                        .id(1L)
+                        .nombre("Matematicas")
+                        .build())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .uuid(UUID.randomUUID())
                 .build();
 
+        Asignatura asignaturaEncontrada = Asignatura.builder()
+                .id(1L)
+                .nombre("Matematicas")
+                .build();
+
+        Alumno alumnoMapeado = Alumno.builder()
+                .nombre("Nicolas")
+                .apellido("Osorio")
+                .grado("2 DAW")
+                .asignatura(asignaturaEncontrada)
+                .build();
+
+        when(asignaturaService.findByNombre("Matematicas")).thenReturn(asignaturaEncontrada);
+
+        // Convertimos el alumno esperado a AlumnoResponseDto))
         AlumnoResponseDto expectedAlumnoResponse = alumnoMapper.toAlumnoResponseDto(expectedAlumno);
 
+        when(alumnoMapper.toAlumno(alumnoCreateDto, asignaturaEncontrada)).thenReturn(alumnoMapeado);
         when(alumnosRepository.save(any(Alumno.class))).thenReturn(expectedAlumno);
+        when(alumnoMapper.toAlumnoResponseDto(expectedAlumno)).thenReturn(expectedAlumnoResponse);
+
 
         // Act
         AlumnoResponseDto actualAlumnoResponse = alumnosService.save(alumnoCreateDto);
