@@ -283,7 +283,7 @@ class AlumnosServiceImplTest {
         assertEquals(expectedAlumnoResponse, actualAlumnoResponse);
 
         // Verify
-        verify(alumnosRepository).save(alumnoCaptor.capture());
+            verify(alumnosRepository).save(alumnoCaptor.capture());
 
         Alumno alumnoCaptured = alumnoCaptor.getValue();
         assertEquals(expectedAlumno.getNombre(), alumnoCaptured.getNombre());
