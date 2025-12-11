@@ -60,7 +60,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements SubProtoco
     public void sendPeriodicMessages() throws IOException {
         for (WebSocketSession session : sessions) {
             if (session.isOpen()) {
-                String broadcast = "serer periodic message " + LocalTime.now();
+                String broadcast = "server periodic message " + LocalTime.now();
                 log.info("Server sends: {}",  broadcast);
                 session.sendMessage(new TextMessage(broadcast));
             }
