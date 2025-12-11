@@ -1,5 +1,7 @@
 package es.nicolas.alumnos.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.nicolas.alumnos.dto.AlumnoCreateDto;
 import es.nicolas.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
@@ -9,24 +11,46 @@ import es.nicolas.alumnos.repositories.AlumnosRepository;
 import es.nicolas.alumnos.exceptions.AlumnoBadUuidException;
 import es.nicolas.alumnos.exceptions.AlumnoNotFoundException;
 import es.nicolas.asignaturas.services.AsignaturaService;
+import es.nicolas.config.websockets.WebSocketConfig;
+import es.nicolas.config.websockets.WebSocketHandler;
+import es.nicolas.websockets.notifications.dto.AlumnoNotificationResponse;
+import es.nicolas.websockets.notifications.mappers.AlumnoNotificationMapper;
+import es.nicolas.websockets.notifications.models.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"alumnos"})
 @Slf4j
 @Service
-public class AlumnosServiceImpl implements AlumnosService{
+public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
     private final AlumnosRepository alumnosRepository;
     private final AlumnoMapper alumnoMapper;
     private final AsignaturaService asignaturaService;
+
+    // Dependencias para WebSockets
+    private final WebSocketConfig webSocketConfig;
+    private final ObjectMapper objectMapper;
+    private final AlumnoNotificationMapper alumnoNotificationMapper;
+    private WebSocketHandler  webSocketService;
+
+    public void afterPropertiesSet(){
+        this.webSocketService = this.webSocketConfig.webSocketAlumnosHandler();
+    }
+
+    // Para inicializar los test's
+    public void setWebSocketService(WebSocketHandler webSocketService) {
+        this.webSocketService = webSocketService;
+    }
 
     @Override
     public List<AlumnoResponseDto> findAll(String nombre, String apellido) {
@@ -76,17 +100,20 @@ public class AlumnosServiceImpl implements AlumnosService{
         }
     }
 
+
     // Cachea con el id del resultado de la operacion como key
     @CachePut(key = "#result.id")
     @Override
     public AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto) {
         log.info("Guardando alumno: {}", alumnoCreateDto);
-        //Creamos un nuevo alumno con los datos que nos vienen
+        //Creamos un nuevo alumno con los datos que nos vienen y la guardamos
         var asignatura = asignaturaService.findByNombre(alumnoCreateDto.getAsignatura());
-        Alumno nuevoAlumno = alumnoMapper.toAlumno(alumnoCreateDto, asignatura);
-        // La guardamos en el repositorio
-        return alumnoMapper.toAlumnoResponseDto(alumnosRepository.save(nuevoAlumno));
+        Alumno alumnoSaved = alumnosRepository.save(alumnoMapper.toAlumno(alumnoCreateDto, asignatura));
+        // Enviamos la notificacion a los clientes mediante ws
+        onChange(Notification.Tipo.CREATE, alumnoSaved);
+        return alumnoMapper.toAlumnoResponseDto(alumnoSaved);
     }
+
 
     @CachePut(key = "#result.id")
     @Override
@@ -95,9 +122,11 @@ public class AlumnosServiceImpl implements AlumnosService{
         //Si no existe, lanzamos una excepcion
         var alumnoActual = alumnosRepository.findById(id).orElseThrow(() -> new AlumnoNotFoundException(id));
         // Actualizamos los campos del alumno
-        Alumno alumnoActualizado = alumnoMapper.toAlumno(alumnoUpdateDto, alumnoActual);
+        Alumno alumnoActualizado = alumnosRepository.save(alumnoMapper.toAlumno(alumnoUpdateDto, alumnoActual));
+        // Enviamos la notificación a los clientes WS
+        onChange(Notification.Tipo.UPDATE, alumnoActualizado);
         //Lo guardamos en el repositorio
-        return alumnoMapper.toAlumnoResponseDto(alumnosRepository.save(alumnoActualizado));
+        return alumnoMapper.toAlumnoResponseDto(alumnoActualizado);
     }
 
     // El key es opcional, si no se pone, usa todos los parametros del metodo
@@ -106,9 +135,49 @@ public class AlumnosServiceImpl implements AlumnosService{
     public void deleteById(Long id) {
         log.info("Borrando alumno por id: {}", id);
         // Si no existe, lanzamos una excepcion
-        alumnosRepository.findById(id).orElseThrow(() -> new AlumnoNotFoundException(id));
+        Alumno alumnoDeleted = alumnosRepository.findById(id).orElseThrow(() ->
+                new AlumnoNotFoundException(id));
         // Si lo encontramos, lo borramos
         alumnosRepository.deleteById(id);
+
+        // Enviamos la notificacion a los clientes ws
+        onChange(Notification.Tipo.DELETE, alumnoDeleted);
     }
 
+    void onChange(Notification.Tipo tipo, Alumno data) {
+        log.debug("Servicio de alumnos onChange con tipo: {} y dato: {}", tipo, data);
+
+        if (webSocketService == null) {
+            log.warn("No se ha podido enviar la notificacion a los clientes ws, no se ha encontrado el servicio");
+            webSocketService = this.webSocketConfig.webSocketAlumnosHandler();
+        }
+
+
+        try {
+            Notification<AlumnoNotificationResponse> notificacion = new Notification<>(
+                    "ALUMNOS",
+                    tipo,
+                    alumnoNotificationMapper.toAlumnoNotificationDto(data),
+                    LocalDateTime.now().toString()
+            );
+
+            String json = objectMapper.writeValueAsString((notificacion));
+
+            log.info("Enviando mensaje a los clientes ws");
+
+            Thread senderThread = new Thread(() -> {
+                try {
+                    webSocketService.sendMessage(json);
+                } catch (Exception e) {
+                    log.error("Error al enviar mensaje a través del servicio WebSocket", e);
+                }
+            });
+            senderThread.setName("WebSocketAlumno-" + data.getId());
+            senderThread.setDaemon(true); // Para que no impida que la app se cierre
+            senderThread.start();
+            log.info("Hilo de websocket iniciando: {}", data.getId());
+        } catch (JsonProcessingException e) {
+            log.error("Error al convertir la notificación a JSON", e);
+        }
+    }
 }

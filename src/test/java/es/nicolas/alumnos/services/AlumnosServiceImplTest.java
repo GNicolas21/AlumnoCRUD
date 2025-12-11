@@ -1,5 +1,6 @@
 package es.nicolas.alumnos.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.nicolas.alumnos.dto.AlumnoCreateDto;
 import es.nicolas.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
@@ -10,11 +11,17 @@ import es.nicolas.alumnos.models.Alumno;
 import es.nicolas.alumnos.repositories.AlumnosRepository;
 import es.nicolas.asignaturas.models.Asignatura;
 import es.nicolas.asignaturas.services.AsignaturaService;
+import es.nicolas.config.websockets.WebSocketConfig;
+import es.nicolas.config.websockets.WebSocketHandler;
+import es.nicolas.websockets.notifications.mappers.AlumnoNotificationMapper;
+import es.nicolas.websockets.notifications.models.Notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -77,9 +84,23 @@ class AlumnosServiceImplTest {
     @Captor
     private ArgumentCaptor<Alumno> alumnoCaptor;
 
+    // Parte de WebSockets
+    @Mock
+    private WebSocketConfig webSocketConfig;
+
+    @Mock
+    private AlumnoNotificationMapper alumnoNotificationMapper;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private WebSocketHandler webSocketService;
+
     @BeforeEach
     void setUp() {
         alumnoResponse1 = alumnoMapper.toAlumnoResponseDto(alumno1);
+        alumnosService.setWebSocketService(webSocketService);
     }
 
     @Test
@@ -105,7 +126,7 @@ class AlumnosServiceImplTest {
     }
 
     @Test
-    void findAll_ShouldReturnAlumnosByNombre_WhenNombreParameterProvided() {
+    void findAll_ShouldReturnAlumnosByNombre_WhenNombreParameterProvided(){
         // Arrange
         String nombre = "Nicolas";
         List <Alumno> expectedAlumnos = List.of(alumno1);
@@ -231,7 +252,7 @@ class AlumnosServiceImplTest {
     }
 
     @Test
-    void save_ShouldReturnSavedTarjeta_WhenValidTarjetaCreateDtoProvided() {
+    void save_ShouldReturnSavedTarjeta_WhenValidAlumnoCreateDtoProvided() throws IOException {
         // Arrange
         AlumnoCreateDto alumnoCreateDto = AlumnoCreateDto.builder()
                 .nombre("Nicolas")
@@ -274,7 +295,7 @@ class AlumnosServiceImplTest {
         when(alumnoMapper.toAlumno(alumnoCreateDto, asignaturaEncontrada)).thenReturn(alumnoMapeado);
         when(alumnosRepository.save(any(Alumno.class))).thenReturn(expectedAlumno);
         when(alumnoMapper.toAlumnoResponseDto(expectedAlumno)).thenReturn(expectedAlumnoResponse);
-
+        doNothing().when(webSocketService).sendMessage(any());
 
         // Act
         AlumnoResponseDto actualAlumnoResponse = alumnosService.save(alumnoCreateDto);
@@ -291,7 +312,7 @@ class AlumnosServiceImplTest {
 
 
     @Test
-    void update_ShouldReturnUpdateAlumno_WhenValidAndalumnoUpdateDtoProvided() {
+    void update_ShouldReturnUpdateAlumno_WhenValidAndalumnoUpdateDtoProvided() throws IOException {
         // Arrange
         Long id = 1L;
         String nombre = "Nicolas Updated";
@@ -306,6 +327,7 @@ class AlumnosServiceImplTest {
 
         alumnoResponse1.setNombre(nombre);
         AlumnoResponseDto existingAlumnoResponse = alumnoResponse1;
+        doNothing().when(webSocketService).sendMessage(any());
 
         // Act
         AlumnoResponseDto actualAlumnoResponse = alumnosService.update(id, alumnoUpdateDto);
@@ -349,20 +371,19 @@ class AlumnosServiceImplTest {
     }
 
     @Test
-    void deleteById_ShouldDeleteAlumno_WhenValidIdProvided() {
+    void deleteById_ShouldDeleteAlumno_WhenValidIdProvided() throws  IOException{
         // Arrange
         Long id = 1L;
         when(alumnosRepository.findById(id)).thenReturn(Optional.of(alumno1));
+        doNothing().when(webSocketService).sendMessage(any());
 
         // AssertJ
         assertThatCode(() -> alumnosService.deleteById(id))
                 .doesNotThrowAnyException();
 
         // Assert
-        verify(alumnosRepository).deleteById(id);
-
-        // Verify
-        verify(alumnosRepository, times(1)).findById(id);
+        verify(alumnosRepository, times(1)).deleteById(id);
+        verify(alumnosRepository).findById(id);
     }
 
     @Test
@@ -379,5 +400,14 @@ class AlumnosServiceImplTest {
 
         // Verify
         verify(alumnosRepository, times(0)).deleteById(id);
+    }
+
+    @Test
+    void onChange_ShouldSendMessage_WhenValidDataProvided() throws IOException{
+        // Arrange
+        doNothing().when(webSocketService).sendMessage(any());
+
+        // Act
+        alumnosService.onChange(Notification.Tipo.CREATE, alumno1);
     }
 }

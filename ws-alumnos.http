@@ -1,0 +1,3 @@
+### Simple WebSocket Request to connect to a server and send a message ###
+
+WEBSOCKET ws://localhost:3000/ws/v1/alumnos
