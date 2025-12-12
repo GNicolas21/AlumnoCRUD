@@ -5,6 +5,7 @@ import es.nicolas.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
 import es.nicolas.alumnos.models.Alumno;
 import es.nicolas.asignaturas.models.Asignatura;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -59,5 +60,10 @@ public class AlumnoMapper {
         return alumnos.stream()
                 .map(this::toAlumnoResponseDto)
                 .toList();
+    }
+
+    // Mapeamos de model a DTO (page)
+    public Page<AlumnoResponseDto> toResponseDtoPage(Page<Alumno> alumnos) {
+        return alumnos.map(this::toAlumnoResponseDto);
     }
 }

@@ -3,12 +3,12 @@ package es.nicolas.alumnos.services;
 import es.nicolas.alumnos.dto.AlumnoCreateDto;
 import es.nicolas.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AlumnosService {
 
-    List<AlumnoResponseDto> findAll(String nombre, String apellido);
+    Page<AlumnoResponseDto> findAll(String nombre, String apellido, Pageable pageable);
 
     AlumnoResponseDto findById(Long id);
 

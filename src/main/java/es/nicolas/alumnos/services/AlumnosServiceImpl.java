@@ -23,6 +23,8 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,9 +43,9 @@ public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
     private final WebSocketConfig webSocketConfig;
     private final ObjectMapper objectMapper;
     private final AlumnoNotificationMapper alumnoNotificationMapper;
-    private WebSocketHandler  webSocketService;
+    private WebSocketHandler webSocketService;
 
-    public void afterPropertiesSet(){
+    public void afterPropertiesSet() {
         this.webSocketService = this.webSocketConfig.webSocketAlumnosHandler();
     }
 
@@ -53,28 +55,34 @@ public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
     }
 
     @Override
-    public List<AlumnoResponseDto> findAll(String nombre, String apellido) {
+    public Page<AlumnoResponseDto> findAll(String nombre, String apellido, Pageable pageable) {
         //Si todos los args están vacios o nulos, devolvemos todos los alumnos
         if ((nombre == null || nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
             log.info("Buscando todos los alumnos");
-            return alumnoMapper.toResponseDtoList(alumnosRepository.findAll());
+//            return alumnoMapper.toResponseDtoList(alumnosRepository.findAll());
+            return alumnosRepository.findAll(pageable).map(alumnoMapper::toAlumnoResponseDto);
         }
 
         //Si el nombre no está vacío pero el apellido si, buscamos por nombre
-        if((nombre != null && !nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
+        if ((nombre != null && !nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
             log.info("Buscando alumnos por nombre: {}", nombre);
-            return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombre(nombre));
+//            return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombre(nombre));
+            return alumnosRepository.findByNombre(nombre, pageable).map(alumnoMapper::toAlumnoResponseDto);
         }
 
         //Si el apellido no está vacío pero el nombre si, buscamos por apellido
         if ((nombre == null || nombre.isEmpty())) {
             log.info("Buscando alumnos por apellido: {}", apellido);
-            return alumnoMapper.toResponseDtoList(alumnosRepository.findByApellidoContainsIgnoreCase(apellido));
+//            return alumnoMapper.toResponseDtoList(alumnosRepository.findByApellidoContainsIgnoreCase(apellido));
+            return alumnosRepository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable)
+                    .map(alumnoMapper::toAlumnoResponseDto);
         }
 
         //Si el nombre y apellido no están vacíos, buscamos por ambos
         log.info("Buscando alumnos por nombre: {}", nombre + " y apellido: " + apellido);
-        return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido));
+        return alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido.toLowerCase(), pageable)
+                .map(alumnoMapper::toAlumnoResponseDto);
+//        return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido));
     }
 
     // Cachea con el id como key

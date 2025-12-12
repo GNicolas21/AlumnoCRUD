@@ -5,9 +5,13 @@ import es.nicolas.alumnos.dto.AlumnoCreateDto;
 import es.nicolas.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
 import es.nicolas.alumnos.services.AlumnosService;
+import es.nicolas.utils.pagination.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -35,23 +39,32 @@ public class AlumnosRestController {
 
     //Obtener todos los alumno o filtrar por nombre y/o apellido
     @GetMapping()
-    public ResponseEntity<List<AlumnoResponseDto>> getAllAlumnos(@RequestParam(required = false) String nombre,
-                                                      @RequestParam(required = false) String apellido){
+    public ResponseEntity<PageResponse<AlumnoResponseDto>> getAllAlumnos(@RequestParam(required = false) String nombre,
+                                                                         @RequestParam(required = false) String apellido,
+                                                                         @RequestParam(defaultValue = "0") int page,
+                                                                         @RequestParam(defaultValue = "10") int size,
+                                                                         @RequestParam(defaultValue = "id") String sortBy,
+                                                                         @RequestParam(defaultValue = "asc") String direction) {
         log.info("Buscando alumnos por nombre: {} y apellido: {}", nombre, apellido);
-        return ResponseEntity.ok(alumnosService.findAll(nombre, apellido));
+        // Creamos el objeto de ordenacion Sort
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        // Creamos la vista de la paginacion
+        Pageable pageable = PageRequest.of(page, size, sort);
+        PageResponse<AlumnoResponseDto> response = PageResponse.of(alumnosService.findAll(nombre, apellido, pageable), sortBy, direction);
+        return ResponseEntity.ok(response);
     }
 
     //Obtener un AlumnoResponseDto por su id, pasado como path variable el id
     //Si existe, lo devuelve, si no, lanza un 404 Not Found
     @GetMapping("/{id}")
-    public ResponseEntity<AlumnoResponseDto> getAlumnoById(@PathVariable Long id){
+    public ResponseEntity<AlumnoResponseDto> getAlumnoById(@PathVariable Long id) {
         log.info("Buscando alumnos por id: {}", id);
         return ResponseEntity.ok(alumnosService.findById(id));
     }
 
     //Crear un nuevo alumnoCreateDto, pasado en el body como JSON, y devolver el alumno creado
     @PostMapping()
-    public ResponseEntity<AlumnoResponseDto> create(@Valid @RequestBody AlumnoCreateDto alumnoCreateDto){
+    public ResponseEntity<AlumnoResponseDto> create(@Valid @RequestBody AlumnoCreateDto alumnoCreateDto) {
         log.info("Creando alumno: {}", alumnoCreateDto);
         var saved = alumnosService.save(alumnoCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -59,40 +72,46 @@ public class AlumnosRestController {
 
     /**
      * Actualiza un alumno existente por su id.
-     * @param id El id del alumno a actualizar.
+     *
+     * @param id                El id del alumno a actualizar.
      * @param /*AlumnoUpdateDto con los datos actualizados.
      * @return ResponseEntity con el alumno actualizado.
-     * @throws /*AlumnoNotFoundException si no existe el alumno (404)
+     * @throws /*AlumnoNotFoundException   si no existe el alumno (404)
      * @throws /*AlumnoBadRequestException si los datos son inválidos (400)
-     * */
+     *
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<AlumnoResponseDto> update(@PathVariable Long id,@Valid @RequestBody AlumnoUpdateDto alumnoUpdateDto) {
+    public ResponseEntity<AlumnoResponseDto> update(@PathVariable Long id, @Valid @RequestBody AlumnoUpdateDto alumnoUpdateDto) {
         log.info("Actualizando alumno con id: {} con alumno: {}", id, alumnoUpdateDto);
         return ResponseEntity.ok(alumnosService.update(id, alumnoUpdateDto));
     }
 
     /**
      * Actualiza parcialmente un alumno existente por su id.
-     * @param id del alumno a actualizar.
+     *
+     * @param id                del alumno a actualizar.
      * @param /*alumnoUpadteDto con los datos a actualizar.
      * @return ResponseEntity con el alumno actualizado.
-     * @throws /*AlumnoNotFoundException si no existe el alumno (404)
+     * @throws /*AlumnoNotFoundException   si no existe el alumno (404)
      * @throws /*AlumnoBadRequestException si los datos son inválidos (400)
-     * */
+     *
+     */
     @PatchMapping("/{id}")
-    public ResponseEntity<AlumnoResponseDto> updatePartial(@PathVariable Long id,@Valid @RequestBody AlumnoUpdateDto alumnoUpdateDto){
+    public ResponseEntity<AlumnoResponseDto> updatePartial(@PathVariable Long id, @Valid @RequestBody AlumnoUpdateDto alumnoUpdateDto) {
         log.info("Actualizando parcialmente alumno con id: {} con alumno: {}", id, alumnoUpdateDto);
         return ResponseEntity.ok(alumnosService.update(id, alumnoUpdateDto));
     }
 
     /**
      * Elimina un alumno existente por su id.
+     *
      * @param id del alumno a eliminar.
      * @return ResponseEntity (204) sin contenido.
      * @throws /*AlumnoNotFoundException si no existe el alumno (404)
-     * */
+     *
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable long id){
+    public ResponseEntity<Void> delete(@PathVariable long id) {
         log.info("Eliminando alumno con id: {}", id);
         alumnosService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -100,6 +119,7 @@ public class AlumnosRestController {
 
     /**
      * Manejador de excepciones de Validacion: 400 Bad Request
+     *
      * @param ex La excepción lanzada.
      * @return Mapa de errores de validación con el campo y el mensaje.
      */
