@@ -6,9 +6,12 @@ import es.nicolas.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.alumnos.dto.AlumnoUpdateDto;
 import es.nicolas.alumnos.services.AlumnosService;
 import es.nicolas.utils.pagination.PageResponse;
+import es.nicolas.utils.pagination.PaginationLinksUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,6 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
@@ -36,22 +40,28 @@ import java.util.*;
 public class AlumnosRestController {
 
     private final AlumnosService alumnosService; //Uso de la @Req.ArgsConst.
+    private final PaginationLinksUtils paginationLinksUtils; // Para las paginaciones
 
-    //Obtener todos los alumno o filtrar por nombre y/o apellido
+    //Obtener todos los alumnos o filtrar por nombre y/o apellido
     @GetMapping()
     public ResponseEntity<PageResponse<AlumnoResponseDto>> getAllAlumnos(@RequestParam(required = false) String nombre,
                                                                          @RequestParam(required = false) String apellido,
                                                                          @RequestParam(defaultValue = "0") int page,
                                                                          @RequestParam(defaultValue = "10") int size,
                                                                          @RequestParam(defaultValue = "id") String sortBy,
-                                                                         @RequestParam(defaultValue = "asc") String direction) {
+                                                                         @RequestParam(defaultValue = "asc") String direction, HttpServletRequest request) {
         log.info("Buscando alumnos por nombre: {} y apellido: {}", nombre, apellido);
         // Creamos el objeto de ordenacion Sort
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         // Creamos la vista de la paginacion
         Pageable pageable = PageRequest.of(page, size, sort);
-        PageResponse<AlumnoResponseDto> response = PageResponse.of(alumnosService.findAll(nombre, apellido, pageable), sortBy, direction);
-        return ResponseEntity.ok(response);
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString());
+
+        Page<AlumnoResponseDto> pageResult = alumnosService.findAll(nombre, apellido, pageable);
+        return ResponseEntity.ok()
+                .header("link", paginationLinksUtils.createLinkHeader(pageResult, uriBuilder))
+                .body(PageResponse.of(pageResult, sortBy, direction));
     }
 
     //Obtener un AlumnoResponseDto por su id, pasado como path variable el id
@@ -74,10 +84,10 @@ public class AlumnosRestController {
      * Actualiza un alumno existente por su id.
      *
      * @param id                El id del alumno a actualizar.
-     * @param /*AlumnoUpdateDto con los datos actualizados.
+     * @param *AlumnoUpdateDto con los datos actualizados.
      * @return ResponseEntity con el alumno actualizado.
-     * @throws /*AlumnoNotFoundException   si no existe el alumno (404)
-     * @throws /*AlumnoBadRequestException si los datos son inválidos (400)
+     * @throws *AlumnoNotFoundException   si no existe el alumno (404)
+     * @throws *AlumnoBadRequestException si los datos son inválidos (400)
      *
      */
     @PutMapping("/{id}")

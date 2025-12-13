@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -50,7 +54,9 @@ class AlumnosRestControllerTest {
     void getAll() {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse1, alumnoResponse2);
-        when(alumnosService.findAll(null, null)).thenReturn(alumnoResponses);
+        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        var page = new PageImpl<>(alumnoResponses);
+        when(alumnosService.findAll(null, null, pageable)).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -62,15 +68,15 @@ class AlumnosRestControllerTest {
         assertThat(result)
                 .hasStatusOk()
                 .bodyJson().satisfies(json -> {
-                    assertThat(json).extractingPath("$.length()").isEqualTo(alumnoResponses.size());
-                    assertThat(json).extractingPath("$[0]")
+                    assertThat(json).extractingPath("$.content.length()").isEqualTo(alumnoResponses.size());
+                    assertThat(json).extractingPath("$.content[0]")
                             .convertTo(AlumnoResponseDto.class).isEqualTo(alumnoResponse1);
-                    assertThat(json).extractingPath("$[1]")
+                    assertThat(json).extractingPath("$.content[1]")
                             .convertTo(AlumnoResponseDto.class).isEqualTo(alumnoResponse2);
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(null, null);
+        verify(alumnosService, times(1)).findAll(null, null, pageable);
     }
 
     @Test
@@ -78,7 +84,8 @@ class AlumnosRestControllerTest {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse2);
         String queryString = "?nombre=" + alumnoResponse2.getNombre();
-        when(alumnosService.findAll(anyString(), isNull())).thenReturn(alumnoResponses);
+        var page = new  PageImpl<>(alumnoResponses);
+        when(alumnosService.findAll(anyString(), isNull(), any(Pageable.class))).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -90,13 +97,13 @@ class AlumnosRestControllerTest {
         assertThat(result)
                 .hasStatusOk()
                 .bodyJson().satisfies(json -> {
-                    assertThat(json).extractingPath("$.length()").isEqualTo(alumnoResponses.size());
-                    assertThat(json).extractingPath("$[0]")
+                    assertThat(json).extractingPath("$.content.length()").isEqualTo(alumnoResponses.size());
+                    assertThat(json).extractingPath("$.content[0]")
                             .convertTo(AlumnoResponseDto.class).isEqualTo(alumnoResponse2);
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(anyString(), isNull());
+        verify(alumnosService, times(1)).findAll(anyString(), isNull(), any(Pageable.class));
     }
 
     @Test
@@ -104,7 +111,8 @@ class AlumnosRestControllerTest {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse1);
         String queryString = "?apellido= " + alumnoResponse1.getApellido();
-        when(alumnosService.findAll(isNull(), anyString())).thenReturn(alumnoResponses);
+        var page = new  PageImpl<>(alumnoResponses);
+        when(alumnosService.findAll(isNull(), anyString(), any(Pageable.class))).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -116,13 +124,13 @@ class AlumnosRestControllerTest {
         assertThat(result)
                 .hasStatusOk()
                 .bodyJson().satisfies(json -> {
-                    assertThat(json).extractingPath("$.length()").isEqualTo(alumnoResponses.size());
-                    assertThat(json).extractingPath("$[0]")
+                    assertThat(json).extractingPath("$.content.length()").isEqualTo(alumnoResponses.size());
+                    assertThat(json).extractingPath("$.content[0]")
                             .convertTo(AlumnoResponseDto.class).isEqualTo(alumnoResponse1);
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(isNull(), anyString());
+        verify(alumnosService, times(1)).findAll(isNull(), anyString(), any(Pageable.class));
     }
 
     @Test
@@ -130,7 +138,8 @@ class AlumnosRestControllerTest {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse1);
         String queryString = "?nombre= " + alumnoResponse1.getNombre() + "&apellido=" + alumnoResponse1.getApellido();
-        when(alumnosService.findAll(anyString(), anyString())).thenReturn(alumnoResponses);
+        var page =  new  PageImpl<>(alumnoResponses);
+        when(alumnosService.findAll(anyString(), anyString(), any(Pageable.class))).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -142,13 +151,13 @@ class AlumnosRestControllerTest {
         assertThat(result)
                 .hasStatusOk()
                 .bodyJson().satisfies(json -> {
-                    assertThat(json).extractingPath("$.length()").isEqualTo(alumnoResponses.size());
-                    assertThat(json).extractingPath("$[0]")
+                    assertThat(json).extractingPath("$.content.length()").isEqualTo(alumnoResponses.size());
+                    assertThat(json).extractingPath("$.content[0]")
                             .convertTo(AlumnoResponseDto.class).isEqualTo(alumnoResponse1);
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(anyString(), anyString());
+        verify(alumnosService, times(1)).findAll(anyString(), anyString(), any(Pageable.class));
     }
 
 

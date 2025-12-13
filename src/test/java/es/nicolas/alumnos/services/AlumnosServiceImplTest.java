@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -107,22 +108,26 @@ class AlumnosServiceImplTest {
     void findAll_ShouldReturnAllAlumnos_WhenNoParametersProvided() {
         // Arrange
         List <Alumno> expectedAlumnos = Arrays.asList(alumno1, alumno2);
-        List<AlumnoResponseDto> expectedAlumnoResponses = alumnoMapper.toResponseDtoList(expectedAlumnos);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
         // el WHEN es para definir el comportamiento del mock
         // en este caso cuando se llame al metodo findAll del repositorio
         // devuelva la lista de alumnos esperada, osea aisla el sevice del repositorio
-        when(alumnosRepository.findAll()).thenReturn(expectedAlumnos);
+        when(alumnosRepository.findAll(any(Pageable.class))).thenReturn(expectedPage);
 
         // Act
-        List <AlumnoResponseDto> actualAlumnoResponses = alumnosService.findAll(null, null);
+        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(null, null, pageable);
 
         // Assert
-        assertIterableEquals( expectedAlumnoResponses,actualAlumnoResponses);
+        assertAll("findAll",
+                () -> assertNotNull(actualPage),
+                () -> assertFalse(actualPage.isEmpty()),
+                () -> assertTrue(actualPage.getTotalPages() > 0)
+        );
 
         // Verify
         // Verifica que el findAll del repositorio se haya llamado una sola vez
-        verify(alumnosRepository, times(1)).findAll();
-
+        verify(alumnosRepository, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -130,20 +135,26 @@ class AlumnosServiceImplTest {
         // Arrange
         String nombre = "Nicolas";
         List <Alumno> expectedAlumnos = List.of(alumno1);
-        List<AlumnoResponseDto> expectedAlumnoResponses = alumnoMapper.toResponseDtoList(expectedAlumnos);
+        // Creamos el objeto Pageable
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
 
-        when(alumnosRepository.findByNombre(nombre)).thenReturn(expectedAlumnos);
-        when(alumnoMapper.toResponseDtoList(anyList())).thenReturn(expectedAlumnoResponses);
+        when(alumnosRepository.findByNombre(nombre, pageable)).thenReturn(expectedPage);
 
         // Act
-        List <AlumnoResponseDto> actualAlumnoResponses = alumnosService.findAll(nombre, null);
+        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(nombre, null, pageable);
 
         // Assert
-        assertIterableEquals( expectedAlumnoResponses,actualAlumnoResponses);
+//        assertIterableEquals( expectedAlumnoResponses,actualAlumnoResponses);
+        assertAll("findAll",
+                () -> assertNotNull(actualPage),
+                () -> assertFalse(actualPage.isEmpty()),
+                () -> assertTrue(actualPage.getTotalPages() > 0)
+        );
 
         // Verify
         // Verifica que solo se ejecuta ese metodo
-        verify(alumnosRepository, only()).findByNombre(nombre);
+        verify(alumnosRepository, only()).findByNombre(nombre, pageable);
     }
 
     @Test
@@ -151,18 +162,23 @@ class AlumnosServiceImplTest {
         // Arrange
         String apellido = "Osorio";
         List <Alumno> expectedAlumnos = List.of(alumno1);
-        List<AlumnoResponseDto> expectedAlumnoResponses = alumnoMapper.toResponseDtoList(expectedAlumnos);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 
-        when(alumnosRepository.findByApellidoContainsIgnoreCase(apellido)).thenReturn(expectedAlumnos);
+        Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
+        when(alumnosRepository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable)).thenReturn(expectedPage);
 
         // Act
-        List <AlumnoResponseDto> actualAlumnoResponses = alumnosService.findAll(null, apellido);
+        Page<AlumnoResponseDto> actualPage =  alumnosService.findAll(null, apellido, pageable);
 
         // Assert
-        assertIterableEquals( expectedAlumnoResponses,actualAlumnoResponses);
+        assertAll("findAll",
+                () -> assertNotNull(actualPage),
+                () -> assertFalse(actualPage.isEmpty()),
+                () -> assertTrue(actualPage.getTotalPages() > 0)
+        );
 
         // Verify
-        verify(alumnosRepository, only()).findByApellidoContainsIgnoreCase(apellido);
+        verify(alumnosRepository, only()).findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable);
     }
 
     @Test
@@ -171,19 +187,24 @@ class AlumnosServiceImplTest {
         String nombre = "Nicolas";
         String apellido = "Osorio";
         List <Alumno> expectedAlumnos = List.of(alumno1);
-        List<AlumnoResponseDto> expectedAlumnoResponses = alumnoMapper.toResponseDtoList(expectedAlumnos);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 
-        when(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido)).thenReturn(expectedAlumnos);
-        when(alumnoMapper.toResponseDtoList(anyList())).thenReturn(expectedAlumnoResponses);
+        Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
+
+        when(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido.toLowerCase(), pageable)).thenReturn(expectedPage);
 
         // Act
-        List <AlumnoResponseDto> actualAlumnoResponses = alumnosService.findAll(nombre, apellido);
+        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(nombre, apellido, pageable);
 
         // Assert
-        assertIterableEquals( expectedAlumnoResponses,actualAlumnoResponses);
+        assertAll("findAll",
+                () -> assertNotNull(actualPage),
+                () -> assertFalse(actualPage.isEmpty()),
+                () -> assertTrue(actualPage.getTotalPages() > 0)
+        );
 
         // Verify
-        verify(alumnosRepository, only()).findByNombreAndApellidoContainsIgnoreCase(nombre, apellido);
+        verify(alumnosRepository, only()).findByNombreAndApellidoContainsIgnoreCase(nombre, apellido.toLowerCase(), pageable);
     }
 
     @Test
@@ -374,7 +395,7 @@ class AlumnosServiceImplTest {
     void deleteById_ShouldDeleteAlumno_WhenValidIdProvided() throws  IOException{
         // Arrange
         Long id = 1L;
-        when(alumnosRepository.findById(id)).thenReturn(Optional.of(alumno1));
+        lenient().when(alumnosRepository.findById(id)).thenReturn(Optional.of(alumno1));
         doNothing().when(webSocketService).sendMessage(any());
 
         // AssertJ

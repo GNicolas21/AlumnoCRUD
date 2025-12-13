@@ -58,6 +58,14 @@ Content-Type: application/json
   "apellido": "Espinoza Cambiado"
 }
 
-
 ### Delete alumno
 DELETE http://localhost:3000/api/v1/alumnos/1
+
+### Paginacion y ordenacion
+GET http://localhost:3000/api/v1/alumnos?sortBy=nombre&direction=desc
+
+###
+GET http://localhost:3000/api/v1/alumnos?sortBy=nombre&direction=desc&size=1
+
+###
+GET http://localhost:3000/api/v1/alumnos?sortBy=nombre&direction=desc&size=1&page=0

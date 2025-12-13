@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
@@ -91,27 +95,30 @@ class AlumnosRepositoryTest {
 
 
     @Test
-    void findByApellidoContainsIgnoreCase() {
-        // Act
-        String apellido = "Osorio";
-        List<Alumno> alumnos = repository.findByApellidoContainsIgnoreCase(apellido);
+    void findByNombre() {
+        String nombre = "Gabriel";
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Alumno> page = repository.findByNombre(nombre, pageable);
         // Assert
-        assertAll("findAllByApellido",
-                () -> assertNotNull(alumnos),
-                () -> assertEquals(1, alumnos.size()),
-                () -> assertEquals(apellido, alumnos.getFirst().getApellido())
+        assertAll("findAllByNombre",
+                () -> assertNotNull(page),
+                () -> assertEquals(1, page.getTotalElements()),
+                () -> assertEquals(nombre, page.getContent().getFirst().getNombre())
         );
     }
 
     @Test
-    void findByNombre() {
-        String nombre = "Gabriel";
-        List<Alumno> alumnos = repository.findByNombre(nombre);
+    void findByApellidoContainsIgnoreCase() {
+        // Act
+        String apellido = "Osorio";
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Alumno> page = repository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable);
         // Assert
-        assertAll("findAllByNombre",
-                () -> assertNotNull(alumnos),
-                () -> assertEquals(1, alumnos.size()),
-                () -> assertEquals(nombre, alumnos.getFirst().getNombre())
+        assertAll("findAllByApellido",
+                () -> assertNotNull(page),
+                () -> assertFalse(page.isEmpty()),
+                () -> assertEquals(1, page.getTotalElements()),
+                () -> assertEquals(apellido, page.getContent().getFirst().getApellido())
         );
     }
 
@@ -120,13 +127,15 @@ class AlumnosRepositoryTest {
         // Act
         String nombre = "Nicolas";
         String apellido = "Osorio";
-        List<Alumno> tarjetas = repository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Alumno> page = repository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido, pageable);
         // Assert
         assertAll(
-                () -> assertNotNull(tarjetas),
-                () -> assertEquals(1, tarjetas.size()),
-                () -> assertEquals(nombre, tarjetas.getFirst().getNombre()),
-                () -> assertEquals(apellido, tarjetas.getFirst().getApellido())
+                () -> assertNotNull(page),
+                () -> assertFalse(page.isEmpty()),
+                () -> assertEquals(1, page.getTotalElements()),
+                () -> assertEquals(nombre, page.getContent().getFirst().getNombre()),
+                () -> assertEquals(apellido, page.getContent().getFirst().getApellido())
         );
     }
 
@@ -310,7 +319,7 @@ class AlumnosRepositoryTest {
 
         // Assert
         assertAll("nextId",
-                // Calcula el siguiente id, en este caso 5 pero no cambia
+                // Calcula el siguiente id, en este caso 5, pero no cambia
                 // el tamaño porque no lo añade a la lista repository
                 () -> assertEquals(4, all.size())
         );
