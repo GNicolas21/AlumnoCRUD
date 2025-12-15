@@ -20,7 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -113,10 +115,12 @@ class AlumnosServiceImplTest {
         // el WHEN es para definir el comportamiento del mock
         // en este caso cuando se llame al metodo findAll del repositorio
         // devuelva la lista de alumnos esperada, osea aisla el sevice del repositorio
-        when(alumnosRepository.findAll(any(Pageable.class))).thenReturn(expectedPage);
+        when(alumnosRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(expectedPage);
 
         // Act
-        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(null, null, pageable);
+        Page <AlumnoResponseDto> actualPage =
+                alumnosService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), pageable);
 
         // Assert
         assertAll("findAll",
@@ -127,22 +131,23 @@ class AlumnosServiceImplTest {
 
         // Verify
         // Verifica que el findAll del repositorio se haya llamado una sola vez
-        verify(alumnosRepository, times(1)).findAll(any(Pageable.class));
+        verify(alumnosRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test
     void findAll_ShouldReturnAlumnosByNombre_WhenNombreParameterProvided(){
         // Arrange
-        String nombre = "Nicolas";
+        Optional<String> nombre = Optional.of("Nicolas");
         List <Alumno> expectedAlumnos = List.of(alumno1);
         // Creamos el objeto Pageable
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
 
-        when(alumnosRepository.findByNombre(nombre, pageable)).thenReturn(expectedPage);
+        when(alumnosRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(expectedPage);
 
         // Act
-        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(nombre, null, pageable);
+        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(nombre, Optional.empty(), Optional.empty(), pageable);
 
         // Assert
 //        assertIterableEquals( expectedAlumnoResponses,actualAlumnoResponses);
@@ -154,21 +159,21 @@ class AlumnosServiceImplTest {
 
         // Verify
         // Verifica que solo se ejecuta ese metodo
-        verify(alumnosRepository, only()).findByNombre(nombre, pageable);
+        verify(alumnosRepository, only()).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test
     void findAll_ShouldReturnAlumnosByApellido_WhenApellidoParameterProvided() {
         // Arrange
-        String apellido = "Osorio";
+        Optional <String> apellido = Optional.of("Osorio");
         List <Alumno> expectedAlumnos = List.of(alumno1);
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 
         Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
-        when(alumnosRepository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable)).thenReturn(expectedPage);
+        when(alumnosRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedPage);
 
         // Act
-        Page<AlumnoResponseDto> actualPage =  alumnosService.findAll(null, apellido, pageable);
+        Page<AlumnoResponseDto> actualPage =  alumnosService.findAll(Optional.empty(), apellido, Optional.empty(), pageable);
 
         // Assert
         assertAll("findAll",
@@ -178,23 +183,24 @@ class AlumnosServiceImplTest {
         );
 
         // Verify
-        verify(alumnosRepository, only()).findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable);
+        verify(alumnosRepository, only()).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test
     void findAll_ShouldReturnAlumnosByNombreAndApellido_WhenBothParametersProvided() {
         // Arrange
-        String nombre = "Nicolas";
-        String apellido = "Osorio";
+        Optional<String> nombre = Optional.of("Nicolas");
+        Optional<String> apellido = Optional.of("Osorio");
         List <Alumno> expectedAlumnos = List.of(alumno1);
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 
         Page<Alumno> expectedPage = new PageImpl<>(expectedAlumnos);
 
-        when(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido.toLowerCase(), pageable)).thenReturn(expectedPage);
+        when(alumnosRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(expectedPage);
 
         // Act
-        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(nombre, apellido, pageable);
+        Page <AlumnoResponseDto> actualPage = alumnosService.findAll(nombre, apellido, Optional.empty(), pageable);
 
         // Assert
         assertAll("findAll",
@@ -204,7 +210,7 @@ class AlumnosServiceImplTest {
         );
 
         // Verify
-        verify(alumnosRepository, only()).findByNombreAndApellidoContainsIgnoreCase(nombre, apellido.toLowerCase(), pageable);
+        verify(alumnosRepository, only()).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

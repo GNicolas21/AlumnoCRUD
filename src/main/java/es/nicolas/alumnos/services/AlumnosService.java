@@ -6,9 +6,11 @@ import es.nicolas.alumnos.dto.AlumnoUpdateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public interface AlumnosService {
 
-    Page<AlumnoResponseDto> findAll(String nombre, String apellido, Pageable pageable);
+    Page<AlumnoResponseDto> findAll(Optional<String> nombre, Optional<String> apellido, Optional<Boolean> isDeleted, Pageable pageable);
 
     AlumnoResponseDto findById(Long id);
 

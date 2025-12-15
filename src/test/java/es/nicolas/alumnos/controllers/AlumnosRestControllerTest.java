@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -56,7 +57,7 @@ class AlumnosRestControllerTest {
         var alumnoResponses = List.of(alumnoResponse1, alumnoResponse2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(alumnoResponses);
-        when(alumnosService.findAll(null, null, pageable)).thenReturn(page);
+        when(alumnosService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -76,7 +77,7 @@ class AlumnosRestControllerTest {
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(null, null, pageable);
+        verify(alumnosService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), pageable);
     }
 
     @Test
@@ -84,8 +85,10 @@ class AlumnosRestControllerTest {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse2);
         String queryString = "?nombre=" + alumnoResponse2.getNombre();
+        Optional<String> nombre = Optional.of(alumnoResponse2.getNombre());
+        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new  PageImpl<>(alumnoResponses);
-        when(alumnosService.findAll(anyString(), isNull(), any(Pageable.class))).thenReturn(page);
+        when(alumnosService.findAll(nombre, Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -103,7 +106,8 @@ class AlumnosRestControllerTest {
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(anyString(), isNull(), any(Pageable.class));
+        verify(alumnosService, times(1))
+                .findAll(nombre, Optional.empty(), Optional.empty(), pageable);
     }
 
     @Test
@@ -111,8 +115,10 @@ class AlumnosRestControllerTest {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse1);
         String queryString = "?apellido= " + alumnoResponse1.getApellido();
+        Optional<String> apellido = Optional.of(alumnoResponse1.getApellido());
+        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new  PageImpl<>(alumnoResponses);
-        when(alumnosService.findAll(isNull(), anyString(), any(Pageable.class))).thenReturn(page);
+        when(alumnosService.findAll(Optional.empty(), apellido, Optional.empty(), pageable)).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -130,7 +136,8 @@ class AlumnosRestControllerTest {
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(isNull(), anyString(), any(Pageable.class));
+        verify(alumnosService, times(1))
+                .findAll(Optional.empty(), apellido, Optional.empty(), pageable);
     }
 
     @Test
@@ -138,8 +145,11 @@ class AlumnosRestControllerTest {
         // Arrange
         var alumnoResponses = List.of(alumnoResponse1);
         String queryString = "?nombre= " + alumnoResponse1.getNombre() + "&apellido=" + alumnoResponse1.getApellido();
+        Optional<String> nombre = Optional.of(alumnoResponse1.getNombre());
+        Optional<String> apellido = Optional.of(alumnoResponse1.getApellido());
+        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page =  new  PageImpl<>(alumnoResponses);
-        when(alumnosService.findAll(anyString(), anyString(), any(Pageable.class))).thenReturn(page);
+        when(alumnosService.findAll(nombre, apellido, Optional.empty(), pageable)).thenReturn(page);
 
         // Act. Consultar el endpoint
         var result = mockMvcTester.get()
@@ -157,7 +167,8 @@ class AlumnosRestControllerTest {
                 });
 
         // Verify
-        verify(alumnosService, times(1)).findAll(anyString(), anyString(), any(Pageable.class));
+        verify(alumnosService, times(1))
+                .findAll(nombre, apellido, Optional.empty(), any(Pageable.class));
     }
 
 

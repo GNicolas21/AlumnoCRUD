@@ -14,4 +14,15 @@ GET http://localhost:3000/api/v1/asignaturas/2
 ### getById (que no existe)
 GET http://localhost:3000/api/v1/asignaturas/9999
 
-### getBy
+### Delete alumno
+DELETE http://localhost:3000/api/v1/asignaturas/1
+
+### Paginacion y ordenación
+GET http://localhost:3000/api/v1/asignaturas?sortBy=nombre&direction=desc
+
+###
+GET  http://localhost:3000/api/v1/asignaturas?sortBy=nombre&direction=desc&size=1
+
+###
+GET  http://localhost:3000/api/v1/asignaturas?sortBy=nombre&direction=desc&page=0
+

@@ -8,10 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
@@ -93,51 +89,6 @@ class AlumnosRepositoryTest {
         );
     }
 
-
-    @Test
-    void findByNombre() {
-        String nombre = "Gabriel";
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        Page<Alumno> page = repository.findByNombre(nombre, pageable);
-        // Assert
-        assertAll("findAllByNombre",
-                () -> assertNotNull(page),
-                () -> assertEquals(1, page.getTotalElements()),
-                () -> assertEquals(nombre, page.getContent().getFirst().getNombre())
-        );
-    }
-
-    @Test
-    void findByApellidoContainsIgnoreCase() {
-        // Act
-        String apellido = "Osorio";
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        Page<Alumno> page = repository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable);
-        // Assert
-        assertAll("findAllByApellido",
-                () -> assertNotNull(page),
-                () -> assertFalse(page.isEmpty()),
-                () -> assertEquals(1, page.getTotalElements()),
-                () -> assertEquals(apellido, page.getContent().getFirst().getApellido())
-        );
-    }
-
-    @Test
-    void findByNombreAndApellidoContainsIgnoreCase() {
-        // Act
-        String nombre = "Nicolas";
-        String apellido = "Osorio";
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        Page<Alumno> page = repository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido, pageable);
-        // Assert
-        assertAll(
-                () -> assertNotNull(page),
-                () -> assertFalse(page.isEmpty()),
-                () -> assertEquals(1, page.getTotalElements()),
-                () -> assertEquals(nombre, page.getContent().getFirst().getNombre()),
-                () -> assertEquals(apellido, page.getContent().getFirst().getApellido())
-        );
-    }
 
     @Test
     void findById_ExistingId_returnsOptionalWithAlumno() {

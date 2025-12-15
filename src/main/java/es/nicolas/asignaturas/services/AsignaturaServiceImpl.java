@@ -1,6 +1,7 @@
 package es.nicolas.asignaturas.services;
 
 import es.nicolas.asignaturas.dto.AsignaturaRequestDto;
+import es.nicolas.asignaturas.exceptions.AsignaturaConflictException;
 import es.nicolas.asignaturas.exceptions.AsignaturaNotFoundException;
 import es.nicolas.asignaturas.mappers.AsignaturasMapper;
 import es.nicolas.asignaturas.models.Asignatura;
@@ -12,6 +13,9 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,20 +29,20 @@ public class AsignaturaServiceImpl implements  AsignaturaService{
     private final AsignaturasMapper asignaturasMapper;
 
     @Override
-    public List<Asignatura> findAll(String nombre) {
-        log.info("Bucando asignaturas por nombre: {}", nombre);
-        if(nombre == null || nombre.isEmpty()){
-            return asignaturasRespository.findAll();
-        } else {
-            return asignaturasRespository.findByNombreContainsIgnoreCase(nombre);
-        }
-    }
+    public Page<Asignatura> findAll(Optional<String> nombre, Optional<Boolean> isDeleted, Pageable pageable) {
+        log.info("Bucando asignaturas por nombre: {}, isDeleted: {}", nombre, isDeleted);
+        // Criterio de busqueda por numero y luego por isDeleted
+        Specification<Asignatura> specNombreAsignatura = (root, query, criteriaBuilder) ->
+                nombre.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombre")), "%" +
+                        n.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
-    @Override
-    public Asignatura findByNombre(String nombre) {
-        log.info("Bucando asignaturas por nombre: {}", nombre);
-        return asignaturasRespository.findByNombreEqualsIgnoreCase(nombre)
-                .orElseThrow(()-> new AsignaturaNotFoundException(nombre));
+        Specification<Asignatura> specIsDeleted = (root, query, criteriaBuilder) ->
+                isDeleted.map(d -> criteriaBuilder.equal(root.get("isDeleted"), d))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Asignatura> criterio = Specification.allOf(specNombreAsignatura, specIsDeleted);
+        return  asignaturasRespository.findAll(criterio, pageable);
     }
 
     @Cacheable
@@ -49,10 +53,21 @@ public class AsignaturaServiceImpl implements  AsignaturaService{
                 .orElseThrow(()-> new AsignaturaNotFoundException(id));
     }
 
+    @Override
+    @Cacheable
+    public Asignatura findByNombre(String nombre) {
+        log.info("Bucando asignaturas por nombre: {}", nombre);
+        return asignaturasRespository.findByNombreEqualsIgnoreCase(nombre)
+                .orElseThrow(()-> new AsignaturaNotFoundException(nombre));
+    }
+
     @CachePut
     @Override
     public Asignatura save(AsignaturaRequestDto asignaturaRequestDto) {
         log.info("Guardando asignatura: {}", asignaturaRequestDto);
+        asignaturasRespository.findByNombreEqualsIgnoreCase(asignaturaRequestDto.getNombre()).ifPresent(asignatura -> {
+            throw new AsignaturaConflictException("Error al guardar asignatura");
+        });
         Asignatura asignatura = asignaturasMapper.toAsignatura(asignaturaRequestDto);
         return asignaturasRespository.save(asignatura);
     }

@@ -2,24 +2,21 @@ package es.nicolas.asignaturas.repositories;
 
 import es.nicolas.asignaturas.models.Asignatura;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.*;
 
-public interface AsignaturasRespository extends JpaRepository<Asignatura, Long> {
+public interface AsignaturasRespository extends JpaRepository<Asignatura, Long>, JpaSpecificationExecutor<Asignatura> {
 
     // Encontrar por nombre
     Optional<Asignatura> findByNombreEqualsIgnoreCase(String nombre);
 
-    // Encontrar por nombre y isDeleted false
-    Optional<Asignatura> findByNombreIgnoreCaseAndIsDeletedFalse(String nombre);
 
     // Lista de asignaturas por nombre
     List<Asignatura> findByNombreContainsIgnoreCase(String nombre);
 
-    // Asignaturas no borradas
-    List<Asignatura> findByIsDeleted(Boolean isDeleted);
 
     // Actualizar la asignatura con isDeleted a true
     // Usar @Modifying y @Query en el servicio

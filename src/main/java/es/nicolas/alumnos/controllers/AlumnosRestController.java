@@ -44,21 +44,23 @@ public class AlumnosRestController {
 
     //Obtener todos los alumnos o filtrar por nombre y/o apellido
     @GetMapping()
-    public ResponseEntity<PageResponse<AlumnoResponseDto>> getAllAlumnos(@RequestParam(required = false) String nombre,
-                                                                         @RequestParam(required = false) String apellido,
+    public ResponseEntity<PageResponse<AlumnoResponseDto>> getAllAlumnos(@RequestParam(required = false) Optional<String> nombre,
+                                                                         @RequestParam(required = false) Optional<String> apellido,
+                                                                         @RequestParam(required = false) Optional<Boolean> isDeleted,
                                                                          @RequestParam(defaultValue = "0") int page,
                                                                          @RequestParam(defaultValue = "10") int size,
                                                                          @RequestParam(defaultValue = "id") String sortBy,
-                                                                         @RequestParam(defaultValue = "asc") String direction, HttpServletRequest request) {
-        log.info("Buscando alumnos por nombre: {} y apellido: {}", nombre, apellido);
+                                                                         @RequestParam(defaultValue = "asc") String direction,
+                                                                         HttpServletRequest request) {
+        log.info("Buscando alumnos por nombre: {}, apellido: {}, isDeleted: {}", nombre, apellido, isDeleted);
         // Creamos el objeto de ordenacion Sort
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         // Creamos la vista de la paginacion
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString());
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
 
-        Page<AlumnoResponseDto> pageResult = alumnosService.findAll(nombre, apellido, pageable);
+        Page<AlumnoResponseDto> pageResult = alumnosService.findAll(nombre, apellido, isDeleted, pageable);
         return ResponseEntity.ok()
                 .header("link", paginationLinksUtils.createLinkHeader(pageResult, uriBuilder))
                 .body(PageResponse.of(pageResult, sortBy, direction));

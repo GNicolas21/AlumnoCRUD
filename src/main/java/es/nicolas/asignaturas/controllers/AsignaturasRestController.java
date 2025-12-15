@@ -3,8 +3,15 @@ package es.nicolas.asignaturas.controllers;
 import es.nicolas.asignaturas.dto.AsignaturaRequestDto;
 import es.nicolas.asignaturas.models.Asignatura;
 import es.nicolas.asignaturas.services.AsignaturaService;
+import es.nicolas.utils.pagination.PageResponse;
+import es.nicolas.utils.pagination.PaginationLinksUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
@@ -21,11 +29,26 @@ import java.util.*;
 @RequestMapping("api/${api.version}/asignaturas")
 public class AsignaturasRestController {
     private final AsignaturaService asignaturaService;
+    private final PaginationLinksUtils paginationLinksUtils;
 
     @GetMapping
-    public ResponseEntity<List<Asignatura>> getAll(@RequestParam(required = false) String nombre){
-        log.info("Buscando asignaturas por nombre: {}", nombre);
-        return ResponseEntity.ok(asignaturaService.findAll(nombre));
+    public ResponseEntity<PageResponse<Asignatura>> getAll(
+            @RequestParam(required = false) Optional<String> nombre,
+            @RequestParam(required = false) Optional<Boolean> isDeleted,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc")  String direction,
+            HttpServletRequest request
+    ){
+        log.info("Buscando asignaturas por nombre: {}, isDeleted: {}", nombre, isDeleted);
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
+        Page <Asignatura> pageResult = asignaturaService.findAll(nombre, isDeleted, pageable);
+        return ResponseEntity.ok()
+                .header("link", paginationLinksUtils.createLinkHeader(pageResult, uriBuilder))
+                .body(PageResponse.of(pageResult, sortBy, direction));
     }
 
     @GetMapping("/{id}")

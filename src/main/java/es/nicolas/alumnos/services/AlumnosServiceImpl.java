@@ -16,6 +16,7 @@ import es.nicolas.config.websockets.WebSocketHandler;
 import es.nicolas.websockets.notifications.dto.AlumnoNotificationResponse;
 import es.nicolas.websockets.notifications.mappers.AlumnoNotificationMapper;
 import es.nicolas.websockets.notifications.models.Notification;
+import jakarta.persistence.criteria.Join;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,6 +26,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,34 +57,48 @@ public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
     }
 
     @Override
-    public Page<AlumnoResponseDto> findAll(String nombre, String apellido, Pageable pageable) {
-        //Si todos los args están vacios o nulos, devolvemos todos los alumnos
-        if ((nombre == null || nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
-            log.info("Buscando todos los alumnos");
-//            return alumnoMapper.toResponseDtoList(alumnosRepository.findAll());
-            return alumnosRepository.findAll(pageable).map(alumnoMapper::toAlumnoResponseDto);
-        }
+    public Page<AlumnoResponseDto> findAll(Optional<String> nombre, Optional<String> apellido, Optional<Boolean> isDeleted, Pageable pageable) {
+//        //Si todos los args están vacios o nulos, devolvemos todos los alumnos
+//        if ((nombre == null || nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
+//            log.info("Buscando todos los alumnos");
+////            return alumnoMapper.toResponseDtoList(alumnosRepository.findAll());
+//            return alumnosRepository.findAll(pageable).map(alumnoMapper::toAlumnoResponseDto);
+//        }
+//
+//        //Si el nombre no está vacío pero el apellido si, buscamos por nombre
+//        if ((nombre != null && !nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
+//            log.info("Buscando alumnos por nombre: {}", nombre);
+////            return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombre(nombre));
+//            return alumnosRepository.findByNombre(nombre, pageable).map(alumnoMapper::toAlumnoResponseDto);
+//        }
+//
+//        //Si el apellido no está vacío, pero el nombre sí y buscamos por apellido
+//        if ((nombre == null || nombre.isEmpty())) {
+//            log.info("Buscando alumnos por apellido: {}", apellido);
+////            return alumnoMapper.toResponseDtoList(alumnosRepository.findByApellidoContainsIgnoreCase(apellido));
+//            return alumnosRepository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable)
+//                    .map(alumnoMapper::toAlumnoResponseDto);
+//        }
 
-        //Si el nombre no está vacío pero el apellido si, buscamos por nombre
-        if ((nombre != null && !nombre.isEmpty()) && (apellido == null || apellido.isEmpty())) {
-            log.info("Buscando alumnos por nombre: {}", nombre);
-//            return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombre(nombre));
-            return alumnosRepository.findByNombre(nombre, pageable).map(alumnoMapper::toAlumnoResponseDto);
-        }
+        log.info("Buscando alumnos por nombre: {}, apellido: {}, isDeleted: {}", nombre, apellido, isDeleted);
+        // Busqyeda por nombre
+        Specification<Alumno> specNombreAlumno = (root, query, criteriaBuilder) ->
+                nombre.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombre")), "%" + n.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true))); // si no hay numero no filtramos
 
-        //Si el apellido no está vacío pero el nombre si, buscamos por apellido
-        if ((nombre == null || nombre.isEmpty())) {
-            log.info("Buscando alumnos por apellido: {}", apellido);
-//            return alumnoMapper.toResponseDtoList(alumnosRepository.findByApellidoContainsIgnoreCase(apellido));
-            return alumnosRepository.findByApellidoContainsIgnoreCase(apellido.toLowerCase(), pageable)
-                    .map(alumnoMapper::toAlumnoResponseDto);
-        }
+        // Busqueda por apellido
+        Specification<Alumno> specApellidoAlumno = (root, query, criteriaBuilder) ->
+                //{Join<Alumno, Alumno> alumnoJoin = root.join("alumno"); Si tuvieramos que tomar datos de otra tabla, hariamos un "JOIN<nomeTabla, nomeTabla>"
+                apellido.map(t -> criteriaBuilder.like(criteriaBuilder.lower(root.get("apellido")), "%" + t.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
-        //Si el nombre y apellido no están vacíos, buscamos por ambos
-        log.info("Buscando alumnos por nombre: {}", nombre + " y apellido: " + apellido);
-        return alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido.toLowerCase(), pageable)
+        Specification<Alumno> specIsDeleted = (root, query, criteriaBuilder) ->
+                isDeleted.map(d -> criteriaBuilder.equal(root.get("isDeleted"), d))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Alumno> criterio = Specification.allOf(specNombreAlumno, specApellidoAlumno, specIsDeleted);
+        return alumnosRepository.findAll(criterio, pageable)
                 .map(alumnoMapper::toAlumnoResponseDto);
-//        return alumnoMapper.toResponseDtoList(alumnosRepository.findByNombreAndApellidoContainsIgnoreCase(nombre, apellido));
     }
 
     // Cachea con el id como key
