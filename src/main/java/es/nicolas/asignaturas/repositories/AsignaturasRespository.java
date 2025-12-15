@@ -25,7 +25,7 @@ public interface AsignaturasRespository extends JpaRepository<Asignatura, Long>,
     void updateIsDeletedToTrueById(Long id);
 
     // obtiene si existe una asignatura con id del alumno
-    @Query("SELECT CASE WHEN COUNT(al) > 0 then true else false end from Alumno al where al.asignatura.id =:id")
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Alumno a where a.asignatura.id =:id")
     Boolean existsByAlumnoById(Long id);
 
 }

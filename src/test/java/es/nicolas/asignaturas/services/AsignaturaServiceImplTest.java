@@ -115,4 +115,21 @@ class AsignaturaServiceImplTest {
         verify(asignaturasRespository, times(0)).save(any(Asignatura.class));
     }
 
+    @Test
+    public void testDeleteById() {
+        when(asignaturasRespository.findById(anyLong())).thenReturn(Optional.of(asignatura));
+        when(asignaturasRespository.existsByAlumnoById(anyLong())).thenReturn(false);
+
+        asignaturaServiceImpl.deleteById(1L);
+
+        assertAll("deleteById",
+                () -> assertNotNull(asignatura),
+                () -> assertEquals("Programacion", asignatura.getNombre())
+        );
+
+        verify(asignaturasRespository, times(1)).findById(anyLong());
+        verify(asignaturasRespository, times(1)).existsByAlumnoById(anyLong());
+        verify(asignaturasRespository, times(1)).deleteById(anyLong());
+    }
+
 }

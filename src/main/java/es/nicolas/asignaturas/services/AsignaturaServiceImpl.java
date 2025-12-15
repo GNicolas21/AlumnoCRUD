@@ -86,8 +86,16 @@ public class AsignaturaServiceImpl implements  AsignaturaService{
     @Transactional // Necesario para que funcione el @Modifying en el repositorio
     public void deleteById(Long id) {
         log.info("Eliminando asignatura con id: {}", id);
-        findById(id); // Verifica si existe, lanza excepción si no
-        asignaturasRespository.deleteById(id);
-
+        Asignatura asignatura = findById(id); // Verifica si existe, lanza excepción si no
+        // O lo marcamos como borrado, para evitar problemas de cascada, no podemos borrar titulares con tarjetas!!!
+        // La otra forma es que comprobáramos si hay tarjetas para borrarlas antes
+        if (asignaturasRespository.existsByAlumnoById(id)) {
+            String mensaje = "No se puede borrar la asignatura con id: " +  id + " porque tiene alumnos asociados";
+            log.warn(mensaje);
+            throw new AsignaturaConflictException(mensaje);
+        } else {
+            asignaturasRespository.deleteById(id);
+        }
+//        asignaturasRespository.deleteById(id);
     }
 }
