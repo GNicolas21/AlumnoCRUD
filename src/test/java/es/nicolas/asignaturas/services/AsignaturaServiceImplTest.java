@@ -115,6 +115,45 @@ class AsignaturaServiceImplTest {
         verify(asignaturasRespository, times(0)).save(any(Asignatura.class));
     }
 
+//    @Test
+//    public void testUpdate() {
+//        when(asignaturasRespository.findById(anyLong())).thenReturn(Optional.of(asignatura));
+//        when(asignaturasRespository.findByNombreEqualsIgnoreCase(anyString())).thenReturn(Optional.of(asignatura));
+//        when(asignaturasMapper.toAsignatura(any(AsignaturaRequestDto.class))).thenReturn(asignatura);
+//        when(asignaturasRespository.save(any(Asignatura.class))).thenReturn(asignatura);
+//
+//        var resultado = asignaturaServiceImpl.update(1L, asignaturaRequestDto);
+//
+//        assertAll("update",
+//                () -> assertNotNull(asignatura),
+//                () -> assertEquals("Programacion", resultado.getNombre())
+//        );
+//
+//        verify(asignaturasRespository, times(1)).findById(1L);
+//        verify(asignaturasRespository, times(1)).findByNombreEqualsIgnoreCase(anyString());
+//        verify(asignaturasRespository, times(1)).save(any(Asignatura.class));
+//    }
+
+    @Test
+    public void testUpdateConflict() {
+        when(asignaturasRespository.findById(anyLong())).thenReturn(Optional.of(asignatura));
+        when(asignaturasRespository.findByNombreEqualsIgnoreCase(anyString())).thenReturn(Optional.of(asignatura));
+
+        var res = assertThrows(AsignaturaConflictException.class,
+                () -> asignaturaServiceImpl.update(2L, asignaturaRequestDto));
+
+        assertAll("updateConflict",
+                () -> assertNotNull(res),
+                () -> assertEquals("Ya existe una asignatura con el nombre Programacion", res.getMessage())
+        );
+
+        verify(asignaturasRespository, times(1)).findById(anyLong());
+        verify(asignaturasRespository, times(1)).findByNombreEqualsIgnoreCase(anyString());
+        verify(asignaturasRespository, times(0)).save(any(Asignatura.class));
+    }
+
+
+
     @Test
     public void testDeleteById() {
         when(asignaturasRespository.findById(anyLong())).thenReturn(Optional.of(asignatura));

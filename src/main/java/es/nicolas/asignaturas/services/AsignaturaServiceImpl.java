@@ -77,6 +77,13 @@ public class AsignaturaServiceImpl implements  AsignaturaService{
     public Asignatura update(Long id, AsignaturaRequestDto asignaturaRequestDto) {
         log.info("Actualizando asignatura con id: {}", id);
         var asignaturaExistente = findById(id);
+        // No debe existir dos asignaturas con el mismo nombre
+        asignaturasRespository.findByNombreEqualsIgnoreCase(asignaturaRequestDto.getNombre()).ifPresent(asig-> {
+            if(!asig.getId().equals(id)){
+                throw new AsignaturaConflictException("Ya existe una asignatura con el nombre " + asignaturaRequestDto.getNombre());
+            }
+        });
+        // Actualizamos los datos
         Asignatura asignaturaActualizada = asignaturasMapper.toAsignatura(asignaturaRequestDto, asignaturaExistente);
         return asignaturasRespository.save(asignaturaActualizada);
     }
