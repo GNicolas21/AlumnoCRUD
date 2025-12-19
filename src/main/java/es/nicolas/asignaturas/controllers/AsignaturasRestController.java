@@ -6,6 +6,7 @@ import es.nicolas.asignaturas.services.AsignaturaService;
 import es.nicolas.utils.pagination.PageResponse;
 import es.nicolas.utils.pagination.PaginationLinksUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,14 +59,14 @@ public class AsignaturasRestController {
     }
 
     @PostMapping
-    public ResponseEntity<Asignatura> create(@RequestBody AsignaturaRequestDto asignaturaRequestDto){
+    public ResponseEntity<Asignatura> create(@Valid @RequestBody AsignaturaRequestDto asignaturaRequestDto){
         log.info("Creando asignatura: {}", asignaturaRequestDto);
         Asignatura nuevaAsignatura = asignaturaService.save(asignaturaRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaAsignatura);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Asignatura> update(@PathVariable Long id, @RequestBody AsignaturaRequestDto asignaturaRequestDto) {
+    public ResponseEntity<Asignatura> update(@PathVariable Long id,@Valid @RequestBody AsignaturaRequestDto asignaturaRequestDto) {
         log.info("Actualizando asignatura con id: {}", id);
         Asignatura updatedAsignatura = asignaturaService.update(id, asignaturaRequestDto);
         return ResponseEntity.ok(updatedAsignatura);

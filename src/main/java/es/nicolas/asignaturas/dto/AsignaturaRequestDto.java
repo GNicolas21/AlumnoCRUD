@@ -1,14 +1,16 @@
 package es.nicolas.asignaturas.dto;
 
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
 @Builder
 @Data
 public class AsignaturaRequestDto {
+    @NotBlank(message = "El nombre no puede estár en blanco.")
     private final String nombre;
-    @Length(max = 4, message = "La duración en horas no puede tener más de 4 caracteres.")
+    @Digits(integer = 3, fraction = 0, message = "La duración en horas no puede tener más de 4 caracteres.")
     private final Integer duracionHoras;
     private final Boolean isDeleted;
 }

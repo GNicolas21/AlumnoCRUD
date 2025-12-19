@@ -1,6 +1,7 @@
 package es.nicolas.asignaturas.controllers;
 
 import es.nicolas.asignaturas.dto.AsignaturaRequestDto;
+import es.nicolas.asignaturas.exceptions.AsignaturaConflictException;
 import es.nicolas.asignaturas.exceptions.AsignaturaNotFoundException;
 import es.nicolas.asignaturas.models.Asignatura;
 import es.nicolas.asignaturas.services.AsignaturaService;
@@ -155,13 +156,191 @@ class AsignaturasRestControllerTest {
         verify(asignaturaService, only()).save(any(AsignaturaRequestDto.class));
     }
 
+    @Test
+    void create_whenBadRequest() {
+        String requestBody = """
+                {
+                    "nombre" : null
+                }
+                """;
+
+        var result = mockMvcTester.post()
+                .uri(ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .hasPathSatisfying("$.errores", path ->
+                        assertThat(path).hasFieldOrProperty("nombre"));
+
+        verify(asignaturaService, never()).save(any(AsignaturaRequestDto.class));
+    }
 
 
+    @Test
+    void create_WhenNombreExists() {
+        String requestBody = """
+                {
+                    "nombre" : "Programacion"
+                }
+                """;
+
+        when(asignaturaService.save(any(AsignaturaRequestDto.class)))
+                .thenThrow(new AsignaturaConflictException("Ya existe una asignatura con el nombre Programacion"));
+
+        var result = mockMvcTester.post()
+                .uri(ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.CONFLICT)
+                .hasFailed().failure()
+                .isInstanceOf(AsignaturaConflictException.class)
+                .hasMessageContaining("Ya existe una asignatura");
+
+    }
 
 
+    @Test
+    void update() {
+        long id = 1L;
+        String requestBody = """
+                {
+                    "nombre" : "PROGRAMACION"
+                }
+        """;
+
+        var asignaturaSaved = Asignatura.builder().id(1L).nombre("PROGRAMACION").build();
+
+        when(asignaturaService.update(anyLong(), any(AsignaturaRequestDto.class))).thenReturn(asignaturaSaved);
+
+        var result = mockMvcTester.put()
+                .uri(ENDPOINT+"/"+ id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(Asignatura.class)
+                .usingRecursiveComparison()
+                .isEqualTo(asignaturaSaved);
+
+        verify(asignaturaService, only()).update(anyLong(), any(AsignaturaRequestDto.class));
+    }
 
 
+    @Test
+    void update_ShouldThrowAsignaturaNotFound() {
+        Long id = 3L;
+        String requestBody = """
+                {
+                    "nombre" : "Programacionnn"
+                }
+                """;
+        when(asignaturaService.update(anyLong(), any(AsignaturaRequestDto.class))).thenThrow(new AsignaturaNotFoundException(id));
+
+        var result =  mockMvcTester.put()
+                .uri(ENDPOINT+"/"+ id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .hasFailed().failure()
+                .isInstanceOf(AsignaturaNotFoundException.class)
+                .hasMessageContaining("no encontrada");
+
+        verify(asignaturaService, only()).update(anyLong(), any());
+    }
 
 
+    @Test
+    void update_ShoulThrowBadRequest() {
+        long id = 3L;
+        String requestBody = """
+                {
+                    "nombre" : ""
+                    }
+        """;
 
+        var result = mockMvcTester.put()
+                .uri(ENDPOINT+"/"+ id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .hasPathSatisfying("$.errores", path ->
+                        assertThat(path).hasFieldOrProperty("nombre"));
+
+        verify(asignaturaService, never()).update(anyLong(), any(AsignaturaRequestDto.class));
+    }
+
+    @Test
+    void update_WhenNombreExists() {
+        long id = 1L;
+        String requestBody = """
+                {
+                    "nombre" : "Programacion"
+                }   
+        """;
+
+        when(asignaturaService.update(anyLong(), any(AsignaturaRequestDto.class)))
+                .thenThrow(new AsignaturaConflictException("Ya existe una asignatura con el nombre Programacion"));
+
+        var result = mockMvcTester.put()
+                .uri(ENDPOINT+"/"+ id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.CONFLICT)
+                .hasFailed().failure()
+                .isInstanceOf(AsignaturaConflictException.class)
+                .hasMessageContaining("Ya existe una asignatura");
+
+        verify(asignaturaService, only()).update(anyLong(), any(AsignaturaRequestDto.class));
+    }
+
+    @Test
+    void delete() {
+        long id = 1L;
+        doNothing().when(asignaturaService).deleteById(anyLong());
+
+        var result = mockMvcTester.delete()
+                .uri(ENDPOINT+"/"+ id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .exchange();
+
+        assertThat(result)
+            .hasStatus(HttpStatus.NO_CONTENT);
+
+        verify(asignaturaService, only()).deleteById(anyLong());
+    }
+
+    @Test
+    void delete_ShouldThrowAsignaturaNotFound() {
+        long id = 1L;
+        doThrow(new AsignaturaNotFoundException(id)).when(asignaturaService).deleteById(anyLong());
+
+        var result = mockMvcTester.delete()
+                .uri(ENDPOINT+"/"+ id)
+                .exchange();
+
+        assertThat(result)
+                .hasStatus(HttpStatus.NOT_FOUND);
+
+        verify(asignaturaService, only()).deleteById(anyLong());
+    }
 }
