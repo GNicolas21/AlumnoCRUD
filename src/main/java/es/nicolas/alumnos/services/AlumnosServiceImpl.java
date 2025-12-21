@@ -16,7 +16,6 @@ import es.nicolas.config.websockets.WebSocketHandler;
 import es.nicolas.websockets.notifications.dto.AlumnoNotificationResponse;
 import es.nicolas.websockets.notifications.mappers.AlumnoNotificationMapper;
 import es.nicolas.websockets.notifications.models.Notification;
-import jakarta.persistence.criteria.Join;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;

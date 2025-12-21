@@ -1,0 +1,28 @@
+### Authorization por token, devuleve y guarda un token
+
+### Proceso de Login
+POST http://localhost:3000/api/v1/auth/signin
+Content-Type: application/json
+
+{
+  "username": "carlos",
+  "password": "User1"
+}
+
+> {% client.global.set("auth_token", response.body.token); %}
+
+### Autorización por token, parte 2. Uso token para autorizar
+
+### Deberia funcionar con rol USER
+GET http://localhost:3000/api/v1/users
+Authorization: Bearer {{auth_token}}
+
+
+## Autenticacion por roles 2
+### Debería funcionar con user
+GET http://localhost:3000/api/v1/users/me/alumnos
+Authorization: Bearer {{auth_token}}
+
+### Debería fallar con user porque no tiene perfil adecuado
+DELETE http://localhost:3000/api/v1/me/profile
+Authorization: Bearer {{auth_token}}
