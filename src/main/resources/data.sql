@@ -14,16 +14,41 @@ create table ALUMNOS (
 );
 */
 
-insert into asignaturas (nombre, duracionhoras)
-        values ('Programacion', 330);
-insert into asignaturas (nombre, duracionhoras)
-    values ('Base Datos', 270);
+insert into asignaturas (nombre)
+values ('Programacion'), ( 'Base Datos'), ('Lenguaje de Marcas');
 
-insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-        values ('Nicolas', 'Osorio', '2 DAW', '1', '550e8400-e29b-41d4-a716-446655440000');
 insert into alumnos (nombre, apellido, grado,asignatura_id, uuid)
-        values ('Bart', 'Benavente', '8 DAM', '1', '550e8400-e29b-41d4-a716-446655440001');
+    values ('Bart', 'Benavente', '8 DAM', '1', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-        values ('Cesar', 'Campos', '3 DAW','2', '550e8400-e29b-41d4-a716-446655440002');
+    values ('Nicolas', 'Osorio', '2 DAW', '1', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-        values ('Dani', 'Delgado', '4 ASIR', '2', '550e8400-e29b-41d4-a716-446655440003');
+    values ('Cesar', 'Campos', '3 DAW','2', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+    values ('Dani', 'Delgado', '4 ASIR', '3', UUID());
+
+-- Datos de ejemplo USUARIOS
+-- Contraseña: Admin1
+-- No está asociado a ningún titulaar
+insert into USUARIOS (nombre, apellidos, username, email, password)
+    values ('Admin', 'Apellidadmin', 'admin', 'admin@prueba.net',
+        '$2a$10$vPaqZvZkz6jhb7U7k/V/v.5vprfNdOnh4sxi/qpPRkYTzPmFlI9p2');
+
+insert into user_roles (user_id, roles)
+    values (1, 'ADMIN');
+insert into user_roles (user_id, roles)
+    values (1, 'USER');
+
+-- Contraseña: User1
+insert into USUARIOS (nombre, apellidos, username, email, password, titular_id)
+    values ('User', 'Apelliduser', 'user', 'user#prueba.net',
+        '$2a$10$e0MYzXyjpJS7Pd0RVvHwHeFX5cpA8AW8LZyWzUAnmK0jWAbHjg5eW', 2);
+insert into user_roles (user_id, roles)
+    values (2, 'USER');
+
+
+-- Contraseña: Test1
+insert into USUARIOS (nombre, apellidos, username, email, password)
+values ('Test', 'Test Test', 'test', 'test@prueba.net',
+        '$2a$10$Pd1yyq2NowcsDf4Cpf/ZXObYFkcycswqHAqBndE1wWJvYwRxlb.Pu');
+insert into USER_ROLES (user_id, roles)
+values (2, 'USER');

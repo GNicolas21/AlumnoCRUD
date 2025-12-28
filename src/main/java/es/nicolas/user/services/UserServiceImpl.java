@@ -1,6 +1,7 @@
 package es.nicolas.user.services;
 
 import es.nicolas.alumnos.repositories.AlumnosRepository;
+import es.nicolas.user.dto.UserInfoResponse;
 import es.nicolas.user.dto.UserRequest;
 import es.nicolas.user.dto.UserResponse;
 import es.nicolas.user.exceptions.UserNameOrEmailExists;
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public Page<UserResponse> findAll(Optional<String> username, Optional<String> email, Optional<Boolean> isDeleted, Pageable pageable) {
-        log.info("Bucando todos los usuarios con username : " + username + " y borrados: " + isDeleted);
+        log.info("Bucando todos los usuarios con username : {} y borrados: {}", username, isDeleted);
         // Criterio de búsqueda por nombre
         Specification<User> specUsernameUser = (root, query, criteriaBuilder) ->
                 username.map(m -> criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" +
@@ -61,16 +62,20 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Cacheable
-    public UserResponse findById(Long id) {
-        log.info("Bucando usuario con id: " + id);
+    public UserInfoResponse findById(Long id) {
+        log.info("Bucando usuario con id: {}", id);
+        // Buscar el usuario
         var user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id));
-        return usersMapper.toUserResponse(user);
+        // Buscar los alumnos asociados al usuario
+        var alumnos = alumnosRepository.findByUsuarioId(id).stream()
+                .map(p -> p.getNombre()).toList();
+        return usersMapper.toUserInfoResponse(user, alumnos);
     }
 
     @Override
     @CachePut(key = "#result.id")
     public UserResponse save(UserRequest userRequest) {
-        log.info("Guardando usuario: " + userRequest);
+        log.info("Guardando usuario: {}", userRequest);
         userRepository.findByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase(userRequest.getUsername(), userRequest.getEmail())
                 .ifPresent(u -> {
                     throw new UserNameOrEmailExists("Ya existe un usuario con ese username o email");
@@ -81,7 +86,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @CachePut(key = "#result.id")
     public UserResponse update(Long id, UserRequest userRequest) {
-        log.info("Actualizando usuario: " + userRequest);
+        log.info("Actualizando usuario: {}", userRequest);
         userRepository.findById(id).orElseThrow(() -> new UserNotFound(id));
         userRepository.findByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase(userRequest.getUsername(), userRequest.getEmail())
                 .ifPresent(u -> {
@@ -97,14 +102,14 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @CacheEvict(key = "#id")
     public void deleteById(Long id) {
-        log.info("Eliminando usuario con id: " + id);
+        log.info("Eliminando usuario con id: {}", id);
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id));
         if(alumnosRepository.existsById(id)){
             // Si hay alumnos, lo marcamos como borrado lógico ¿)
-            log.info("Borrado lógico de usuario por id: " + id);
+            log.info("Borrado lógico de usuario por id: {}", id);
             userRepository.updateIsDeletedToTrueById(id);
         } else {
-            log.info("Borrado fisico de usuario por id: " + id);
+            log.info("Borrado fisico de usuario por id: {}", id);
             userRepository.delete(user);
         }
     }

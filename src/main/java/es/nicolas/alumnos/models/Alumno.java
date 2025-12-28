@@ -1,7 +1,6 @@
 package es.nicolas.alumnos.models;
 
 import es.nicolas.asignaturas.models.Asignatura;
-import es.nicolas.user.models.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,6 +48,4 @@ public class Alumno {
     @JoinColumn(name="asignatura_id")
     private Asignatura asignatura;
 
-    @OneToOne(mappedBy = "alumno")
-    private User usuario;
 }

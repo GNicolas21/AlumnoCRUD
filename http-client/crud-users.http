@@ -1,22 +1,27 @@
 ### getAll
 GET http://localhost:3000/api/v1/users
+Authorization: Bearer {{auth_token}}
 
-### gatById
+### getById
 GET http://localhost:3000/api/v1/users/1
+Authorization: Bearer {{auth_token}}
 
-### gatById (uno que no existe)
+### getById (uno que no existe)
 GET http://localhost:3000/api/v1/users/300
+Authorization: Bearer {{auth_token}}
+
 
 ### Nuevo usuario (contraseña User1)
 POST http://localhost:3000/api/v1/users
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "nombre": "Carlos",
-  "apellidos": "Carlos User",
-  "username": "carlos",
+  "nombre": "Nicolas",
+  "apellidos": "Nicolas User",
+  "username": "nicolas",
   "password": "$2a$12$RUq2ScW1Kiizu5K4gKoK4OTz80.DWaruhdyfi2lZCB.KeuXTBh0S.",
-  "email": "carlos@prueba.net",
+  "email": "nicolas@prueba.net",
   "roles": [
     "USER"
   ]
@@ -24,15 +29,16 @@ Content-Type: application/json
 
 
 ### Actualiza tarjeta
-PUT http://localhost:3000/api/v1/users/5
+PUT http://localhost:3000/api/v1/users/4
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "nombre": "Carlos",
-  "apellidos": "Carlos User",
-  "username": "carlos",
+  "nombre": "Nicolas",
+  "apellidos": "Nicolas User",
+  "username": "NicolasPUT",
   "password": "$2a$12$RUq2ScW1Kiizu5K4gKoK4OTz80.DWaruhdyfi2lZCB.KeuXTBh0S.",
-  "email": "carlos@hotmail.com",
+  "email": "nicolas@hotmail.com",
   "roles": [
     "USER"
   ]
@@ -40,4 +46,38 @@ Content-Type: application/json
 
 
 ### Delete tarjeta
-DELETE http://localhost:3000/api/v1/users/5
+DELETE http://localhost:3000/api/v1/users/4
+Authorization: Bearer {{auth_token}}
+
+
+
+### Autorización por token, parte 2. Uso token para autorizar
+
+### Deberia funcionar con rol USER
+GET http://localhost:3000/api/v1/users/me/profile
+Authorization: Bearer {{auth_token}}
+
+## Alumnos del usuario autenticado que deberia funcionar con USER
+### Debería funcionar con user
+GET http://localhost:3000/api/v1/users/me/alumnos
+Authorization: Bearer {{auth_token}}
+
+### Debería funcionar con user
+GET http://localhost:3000/api/v1/users/me/alumnos/1
+Authorization: Bearer {{auth_token}}
+
+### Debería funcionar con user
+POST http://localhost:3000/api/v1/users/me/alumnos
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "nombre": "Alumno1",
+  "apellido": "Apellido",
+  "grado": "Elementa",
+  "asignatura": "asdsda"
+}
+
+### Debería fallar con user porque no tiene perfil adecuado
+DELETE http://localhost:3000/api/v1/me/profile
+Authorization: Bearer {{auth_token}}

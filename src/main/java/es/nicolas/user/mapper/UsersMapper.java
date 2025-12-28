@@ -1,9 +1,12 @@
 package es.nicolas.user.mapper;
 
+import es.nicolas.user.dto.UserInfoResponse;
 import es.nicolas.user.dto.UserRequest;
 import es.nicolas.user.dto.UserResponse;
 import es.nicolas.user.models.User;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class UsersMapper {
@@ -41,6 +44,19 @@ public class UsersMapper {
                 .email(user.getEmail())
                 .roles(user.getRoles())
                 .isDeleted(user.getIsDeleted())
+                .build();
+    }
+
+    public UserInfoResponse toUserInfoResponse(User user, List<String> alumnos) {
+        return UserInfoResponse.builder()
+                .id(user.getId())
+                .nombre(user.getNombre())
+                .apellidos(user.getApellidos())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .roles(user.getRoles())
+                .isDeleted(user.getIsDeleted())
+                .alumnos(alumnos)
                 .build();
     }
 

@@ -14,12 +14,18 @@ public interface AlumnosService {
 
     AlumnoResponseDto findById(Long id);
 
+    Page<AlumnoResponseDto> findByUsuarioId(Long usuarioId, Pageable pageable);
+    AlumnoResponseDto findByUsuarioId(Long usuarioId, Long idAlumno);
+
     AlumnoResponseDto findByUuid(String uuid);
 
     AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto);
+    AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto, Long usuarioId);
 
     AlumnoResponseDto update(Long id, AlumnoUpdateDto alumnoUpdateDto);
+    AlumnoResponseDto update(Long id, AlumnoUpdateDto alumnoUpdateDto,  Long usuarioId);
 
     void deleteById(Long id);
+    void deleteById(Long id, Long usuarioId);
 
 }

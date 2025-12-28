@@ -11,7 +11,6 @@ public class AsignaturasMapper {
         return Asignatura.builder()
                 .id(null)
                 .nombre(asignaturaRequestDto.getNombre())
-                .duracionHoras(asignaturaRequestDto.getDuracionHoras())
                 .build();
     }
 
@@ -20,7 +19,6 @@ public class AsignaturasMapper {
         return Asignatura.builder()
                 .id(asignatura.getId())
                 .nombre(dto.getNombre() != null ? dto.getNombre() : asignatura.getNombre())
-                .duracionHoras(dto.getDuracionHoras() != null ? dto.getDuracionHoras() : asignatura.getDuracionHoras())
                 .createdAt(asignatura.getCreatedAt())
                 // Este campo es automatico
                 // .updatedAt(LocalDateTime.now())

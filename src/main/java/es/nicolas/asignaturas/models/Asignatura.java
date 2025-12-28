@@ -2,6 +2,7 @@ package es.nicolas.asignaturas.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import es.nicolas.alumnos.models.Alumno;
+import es.nicolas.user.models.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,9 +25,6 @@ public class Asignatura {
     @Column(unique = true, nullable = false, length = 20)
     private String nombre;
 
-    @Column(name = "duracionhoras")
-    private Integer duracionHoras;
-
     @Builder.Default
     @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -45,4 +43,6 @@ public class Asignatura {
     @OneToMany(mappedBy = "asignatura")
     private List<Alumno> alumnos; // Una asignatura puede tener muchos alumnos
 
+    @OneToOne(mappedBy = "asignatura")
+    private User usuario;
 }

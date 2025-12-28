@@ -5,24 +5,33 @@ POST http://localhost:3000/api/v1/auth/signin
 Content-Type: application/json
 
 {
-  "username": "carlos",
-  "password": "User1"
+  "username": "admin",
+  "password": "Admin1"
 }
 
 > {% client.global.set("auth_token", response.body.token); %}
 
-### Autorización por token, parte 2. Uso token para autorizar
+### Proceso de Registro
+POST http://localhost:3000/api/v1/auth/signup
+Content-Type: application/json
 
-### Deberia funcionar con rol USER
-GET http://localhost:3000/api/v1/users
-Authorization: Bearer {{auth_token}}
+{
+    "nombre": "Test",
+    "apellidos": "Test",
+    "username": "test2",
+    "email": "test@test.com",
+    "password": "12345",
+    "passwordComprobacion": "12345",
+    "roles": ["USER"]
+}
 
+### Obtener nuevo token para el usuario registrado
+POST http://localhost:3000/api/v1/auth/signin
+Content-Type: application/json
 
-## Autenticacion por roles 2
-### Debería funcionar con user
-GET http://localhost:3000/api/v1/users/me/alumnos
-Authorization: Bearer {{auth_token}}
+{
+  "username": "test2",
+  "password": "12345"
+}
 
-### Debería fallar con user porque no tiene perfil adecuado
-DELETE http://localhost:3000/api/v1/me/profile
-Authorization: Bearer {{auth_token}}
+> {% client.global.set("auth_token", response.body.token); %}

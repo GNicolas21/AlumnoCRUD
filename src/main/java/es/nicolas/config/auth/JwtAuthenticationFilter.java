@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String userName = null;
 
         // Si no tenemos cabereca o empieza por BEarer no hacemos nada
-        if (!StringUtils.hasText(authHEader) || StringUtils.startsWithIgnoreCase(authHEader, "Bearer")) {
+        if (!StringUtils.hasText(authHEader) || !StringUtils.startsWithIgnoreCase(authHEader, "Bearer ")) {
             log.info("No se ha encontrado cabecera de autenticación, se ignora");
             filterChain.doFilter(request, response);
             return;

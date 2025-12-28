@@ -1,5 +1,6 @@
 package es.nicolas.user.services;
 
+import es.nicolas.user.dto.UserInfoResponse;
 import es.nicolas.user.dto.UserRequest;
 import es.nicolas.user.dto.UserResponse;
 import es.nicolas.user.models.User;
@@ -12,7 +13,7 @@ import java.util.Optional;
 public interface UserService {
     Page<UserResponse> findAll(Optional<String> username, Optional<String> email, Optional<Boolean> isDeleted, Pageable pageable);
 
-    UserResponse findById(Long id);
+    UserInfoResponse findById(Long id);
 
     UserResponse save(UserRequest userRequest);
 

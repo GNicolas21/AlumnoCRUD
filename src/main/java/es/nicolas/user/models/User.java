@@ -1,6 +1,6 @@
 package es.nicolas.user.models;
 
-import es.nicolas.alumnos.models.Alumno;
+import es.nicolas.asignaturas.models.Asignatura;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -62,7 +62,7 @@ public class User implements UserDetails {
 
     @OneToOne
     @JoinColumn(name = "titular_id")
-    private Alumno alumno;
+    private Asignatura asignatura;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

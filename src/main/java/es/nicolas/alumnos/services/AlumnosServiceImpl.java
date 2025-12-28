@@ -10,6 +10,8 @@ import es.nicolas.alumnos.models.Alumno;
 import es.nicolas.alumnos.repositories.AlumnosRepository;
 import es.nicolas.alumnos.exceptions.AlumnoBadUuidException;
 import es.nicolas.alumnos.exceptions.AlumnoNotFoundException;
+import es.nicolas.asignaturas.models.Asignatura;
+import es.nicolas.asignaturas.repositories.AsignaturasRespository;
 import es.nicolas.asignaturas.services.AsignaturaService;
 import es.nicolas.config.websockets.WebSocketConfig;
 import es.nicolas.config.websockets.WebSocketHandler;
@@ -39,6 +41,64 @@ public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
     private final AlumnosRepository alumnosRepository;
     private final AlumnoMapper alumnoMapper;
     private final AsignaturaService asignaturaService;
+    private final AsignaturasRespository asignaturasRespository;
+
+    @Override
+    public AlumnoResponseDto findByUsuarioId(Long usuarioId, Long idAlumno) {
+        var alumnos = alumnosRepository.findByUsuarioId(idAlumno);
+        var alumnosEncontrados = alumnos.stream()
+                .filter(alumno -> alumno.getId().equals(idAlumno))
+                .findFirst()
+                .orElse(null);
+        if (alumnosEncontrados == null) {
+            throw new AlumnoNotFoundException(alumnos.getFirst().getId());
+        }
+        return alumnoMapper.toAlumnoResponseDto(alumnosEncontrados);
+    }
+
+    /**
+     * Comprueba si existe el alumno
+     * @param nombreAsignatura Nombre de la Asignatura
+     */
+    private Asignatura checkedAsignatura(String nombreAsignatura) {
+        var a = asignaturasRespository.findByNombreEqualsIgnoreCase(nombreAsignatura);
+        return a.get();
+    }
+
+    @Override
+    public AlumnoResponseDto save(AlumnoCreateDto alumnoCreateDto, Long usuarioId) {
+        Asignatura asignatura = checkedAsignatura(alumnoCreateDto.getAsignatura());
+        var usuario = asignatura.getUsuario();
+        if ((usuario != null) && (!usuario.getId().equals(usuarioId))) {
+        }
+        Alumno alumnoSaved = alumnosRepository.save(
+                alumnoMapper.toAlumno(alumnoCreateDto, asignatura));
+        // Enviamos la notificacion a los clientes mediante ws
+        onChange(Notification.Tipo.CREATE, alumnoSaved);
+        // La guardamos en el repositorio
+        return alumnoMapper.toAlumnoResponseDto(alumnoSaved);
+    }
+
+    @Override
+    public AlumnoResponseDto update(Long id, AlumnoUpdateDto alumnoUpdateDto, Long usuarioId) {
+        var alumnoActual = alumnosRepository.findById(id).orElseThrow(() -> new AlumnoNotFoundException(id));
+        var usuario = alumnoActual.getAsignatura().getUsuario();
+        Alumno alumnoActualizado = alumnosRepository.save(
+                alumnoMapper.toAlumno(alumnoUpdateDto, alumnoActual));
+        // Enviamos la notificación a los clientes WS
+        onChange(Notification.Tipo.UPDATE, alumnoActualizado);
+        return alumnoMapper.toAlumnoResponseDto(alumnoActualizado);
+    }
+
+    @Override
+    public void deleteById(Long id, Long usuarioId) {
+        Alumno alumnoDeleted = alumnosRepository.findById(id).orElseThrow(() ->
+                new AlumnoNotFoundException(id));
+        var usuario = alumnoDeleted.getAsignatura().getUsuario();
+        alumnosRepository.deleteById(id);
+        // Enviamos la notificacion a los clientes ws
+        onChange(Notification.Tipo.DELETE, alumnoDeleted);
+    }
 
     // Dependencias para WebSockets
     private final WebSocketConfig webSocketConfig;
@@ -123,6 +183,12 @@ public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
         }
     }
 
+    @Override
+    public Page<AlumnoResponseDto> findByUsuarioId(Long idUsuario, Pageable pageable) {
+        log.info("Buscando alumnos del usuario con id: {}", idUsuario);
+        return alumnosRepository.findByUsuarioId(idUsuario, pageable)
+                .map(alumnoMapper::toAlumnoResponseDto);
+    }
 
     // Cachea con el id del resultado de la operacion como key
     @CachePut(key = "#result.id")
