@@ -1,9 +1,4 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
-
-
-### GET allAlumnos
+### getAll Alumnos
 GET http://localhost:3000/api/v1/alumnos
 
 

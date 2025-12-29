@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService{
     public void deleteById(Long id) {
         log.info("Eliminando usuario con id: {}", id);
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFound(id));
-        if(alumnosRepository.existsById(id)){
+        if(alumnosRepository.existsByUsuarioId(id)){
             // Si hay alumnos, lo marcamos como borrado lógico ¿)
             log.info("Borrado lógico de usuario por id: {}", id);
             userRepository.updateIsDeletedToTrueById(id);
