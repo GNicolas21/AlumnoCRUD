@@ -9,6 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +20,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -43,32 +49,34 @@ public class SecurityConfig {
 
             // Deshabilitamos CSRF
             .csrf(AbstractHttpConfigurer::disable)
-                // Sesiones
-                .sessionManagement(
-                        manager -> manager.sessionCreationPolicy(STATELESS))
-                        // Decimos que URLs queremos dar acceso libre
-                        // Lista blanca de comprobación
-                .authorizeHttpRequests(req -> req
-                        .requestMatchers("/error/**").permitAll()
+            // Activamos CORS
+            .cors(Customizer.withDefaults())
+            // Sesiones
+            .sessionManagement(
+                    manager -> manager.sessionCreationPolicy(STATELESS))
+                    // Decimos que URLs queremos dar acceso libre
+                    // Lista blanca de comprobación
+            .authorizeHttpRequests(req -> req
+                    .requestMatchers("/error/**").permitAll()
 
-                        // Websockets para notificaciones
-                        .requestMatchers("/ws/**").permitAll()
+                    // Websockets para notificaciones
+                    .requestMatchers("/ws/**").permitAll()
 
-                        // Otras rutas de la API, podemos permitirlas o no...
-                        .requestMatchers("/api/" + apiVersion + "/**").permitAll()
-                        // Podríamos jugar con permisos, por ejemplo para una ruta concreta
-                        //.requestMatchers("/" + apiVersion + "/auth/me").hasRole("ADMIN")
-                        // O con un acción HTTP, POST, PUT, DELETE, etc.
-                        //.requestMatchers(GET, "/" + apiVersion + "/auth/me").hasRole("ADMIN")
-                        // O con un patrón de ruta
-                        //.regexMatchers("/" + apiVersion + "/auth/me").hasRole("ADMIN")
-                        // El resto de peticiones tienen que estar autenticadas
+                    // Otras rutas de la API, podemos permitirlas o no...
+                    .requestMatchers("/api/" + apiVersion + "/**").permitAll()
+                    // Podríamos jugar con permisos, por ejemplo para una ruta concreta
+                    //.requestMatchers("/" + apiVersion + "/auth/me").hasRole("ADMIN")
+                    // O con un acción HTTP, POST, PUT, DELETE, etc.
+                    //.requestMatchers(GET, "/" + apiVersion + "/auth/me").hasRole("ADMIN")
+                    // O con un patrón de ruta
+                    //.regexMatchers("/" + apiVersion + "/auth/me").hasRole("ADMIN")
+                    // El resto de peticiones tienen que estar autenticadas
 
-                        .anyRequest().authenticated()
-                )
+                    .anyRequest().authenticated()
+            )
 
-                .authenticationProvider(autenticationProvider()).addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .authenticationProvider(autenticationProvider()).addFilterBefore(
+                    jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Devolvemos la configuración
         return http.build();
@@ -103,5 +111,17 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager autenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.applyPermitDefaultValues();
+        configuration.setAllowedOrigins(List.of("http://mifrontend.es"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

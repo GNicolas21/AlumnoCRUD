@@ -43,6 +43,9 @@ public class AlumnosRestController {
     private final PaginationLinksUtils paginationLinksUtils; // Para las paginaciones
 
     //Obtener todos los alumnos o filtrar por nombre y/o apellido
+    // Podemos activar CORS en SecurityConfig de manera centralizada
+    // o por método de esta manera
+    //@CrossOrigin(origins = "http://mifrontend.es")
     @GetMapping()
     public ResponseEntity<PageResponse<AlumnoResponseDto>> getAllAlumnos(@RequestParam(required = false) Optional<String> nombre,
                                                                          @RequestParam(required = false) Optional<String> apellido,
@@ -86,10 +89,10 @@ public class AlumnosRestController {
      * Actualiza un alumno existente por su id.
      *
      * @param id                El id del alumno a actualizar.
-     * @param *AlumnoUpdateDto con los datos actualizados.
+     * @param AlumnoUpdateDto con los datos actualizados.
      * @return ResponseEntity con el alumno actualizado.
-     * @throws *AlumnoNotFoundException   si no existe el alumno (404)
-     * @throws *AlumnoBadRequestException si los datos son inválidos (400)
+     * @throws AlumnoNotFoundException   si no existe el alumno (404)
+     * @throws AlumnoBadRequestException si los datos son inválidos (400)
      *
      */
     @PutMapping("/{id}")
@@ -104,8 +107,8 @@ public class AlumnosRestController {
      * @param id                del alumno a actualizar.
      * @param /*alumnoUpadteDto con los datos a actualizar.
      * @return ResponseEntity con el alumno actualizado.
-     * @throws /*AlumnoNotFoundException   si no existe el alumno (404)
-     * @throws /*AlumnoBadRequestException si los datos son inválidos (400)
+     * @throws AlumnoNotFoundException   si no existe el alumno (404)
+     * @throws AlumnoBadRequestException si los datos son inválidos (400)
      *
      */
     @PatchMapping("/{id}")
@@ -119,7 +122,7 @@ public class AlumnosRestController {
      *
      * @param id del alumno a eliminar.
      * @return ResponseEntity (204) sin contenido.
-     * @throws /*AlumnoNotFoundException si no existe el alumno (404)
+     * @throws AlumnoNotFoundException si no existe el alumno (404)
      *
      */
     @DeleteMapping("/{id}")
