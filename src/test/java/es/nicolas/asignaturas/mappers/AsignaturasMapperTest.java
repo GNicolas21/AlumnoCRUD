@@ -1,7 +1,8 @@
 package es.nicolas.asignaturas.mappers;
 
-import es.nicolas.asignaturas.dto.AsignaturaRequestDto;
-import es.nicolas.asignaturas.models.Asignatura;
+import es.nicolas.rest.asignaturas.dto.AsignaturaRequestDto;
+import es.nicolas.rest.asignaturas.mappers.AsignaturasMapper;
+import es.nicolas.rest.asignaturas.models.Asignatura;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

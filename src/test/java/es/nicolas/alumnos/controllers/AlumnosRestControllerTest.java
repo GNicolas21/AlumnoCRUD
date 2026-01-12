@@ -1,10 +1,10 @@
 package es.nicolas.alumnos.controllers;
 
-import es.nicolas.alumnos.dto.AlumnoCreateDto;
-import es.nicolas.alumnos.dto.AlumnoResponseDto;
-import es.nicolas.alumnos.dto.AlumnoUpdateDto;
-import es.nicolas.alumnos.exceptions.AlumnoNotFoundException;
-import es.nicolas.alumnos.services.AlumnosService;
+import es.nicolas.rest.alumnos.dto.AlumnoCreateDto;
+import es.nicolas.rest.alumnos.dto.AlumnoResponseDto;
+import es.nicolas.rest.alumnos.dto.AlumnoUpdateDto;
+import es.nicolas.rest.alumnos.exceptions.AlumnoNotFoundException;
+import es.nicolas.rest.alumnos.services.AlumnosService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

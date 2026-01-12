@@ -1,16 +1,17 @@
 package es.nicolas.alumnos.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.nicolas.alumnos.dto.AlumnoCreateDto;
-import es.nicolas.alumnos.dto.AlumnoResponseDto;
-import es.nicolas.alumnos.dto.AlumnoUpdateDto;
-import es.nicolas.alumnos.exceptions.AlumnoBadUuidException;
-import es.nicolas.alumnos.exceptions.AlumnoNotFoundException;
-import es.nicolas.alumnos.mappers.AlumnoMapper;
-import es.nicolas.alumnos.models.Alumno;
-import es.nicolas.alumnos.repositories.AlumnosRepository;
-import es.nicolas.asignaturas.models.Asignatura;
-import es.nicolas.asignaturas.services.AsignaturaService;
+import es.nicolas.rest.alumnos.dto.AlumnoCreateDto;
+import es.nicolas.rest.alumnos.dto.AlumnoResponseDto;
+import es.nicolas.rest.alumnos.dto.AlumnoUpdateDto;
+import es.nicolas.rest.alumnos.exceptions.AlumnoBadUuidException;
+import es.nicolas.rest.alumnos.exceptions.AlumnoNotFoundException;
+import es.nicolas.rest.alumnos.mappers.AlumnoMapper;
+import es.nicolas.rest.alumnos.models.Alumno;
+import es.nicolas.rest.alumnos.repositories.AlumnosRepository;
+import es.nicolas.rest.alumnos.services.AlumnosServiceImpl;
+import es.nicolas.rest.asignaturas.models.Asignatura;
+import es.nicolas.rest.asignaturas.services.AsignaturaService;
 import es.nicolas.config.websockets.WebSocketConfig;
 import es.nicolas.config.websockets.WebSocketHandler;
 import es.nicolas.websockets.notifications.mappers.AlumnoNotificationMapper;

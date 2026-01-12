@@ -1,10 +1,11 @@
 package es.nicolas.asignaturas.services;
 
-import es.nicolas.asignaturas.dto.AsignaturaRequestDto;
-import es.nicolas.asignaturas.exceptions.AsignaturaConflictException;
-import es.nicolas.asignaturas.mappers.AsignaturasMapper;
-import es.nicolas.asignaturas.models.Asignatura;
-import es.nicolas.asignaturas.repositories.AsignaturasRespository;
+import es.nicolas.rest.asignaturas.dto.AsignaturaRequestDto;
+import es.nicolas.rest.asignaturas.exceptions.AsignaturaConflictException;
+import es.nicolas.rest.asignaturas.mappers.AsignaturasMapper;
+import es.nicolas.rest.asignaturas.models.Asignatura;
+import es.nicolas.rest.asignaturas.repositories.AsignaturasRespository;
+import es.nicolas.rest.asignaturas.services.AsignaturaServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

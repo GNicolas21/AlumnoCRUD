@@ -1,10 +1,10 @@
 package es.nicolas.asignaturas.controllers;
 
-import es.nicolas.asignaturas.dto.AsignaturaRequestDto;
-import es.nicolas.asignaturas.exceptions.AsignaturaConflictException;
-import es.nicolas.asignaturas.exceptions.AsignaturaNotFoundException;
-import es.nicolas.asignaturas.models.Asignatura;
-import es.nicolas.asignaturas.services.AsignaturaService;
+import es.nicolas.rest.asignaturas.dto.AsignaturaRequestDto;
+import es.nicolas.rest.asignaturas.exceptions.AsignaturaConflictException;
+import es.nicolas.rest.asignaturas.exceptions.AsignaturaNotFoundException;
+import es.nicolas.rest.asignaturas.models.Asignatura;
+import es.nicolas.rest.asignaturas.services.AsignaturaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.setDescriptionConsumer;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest

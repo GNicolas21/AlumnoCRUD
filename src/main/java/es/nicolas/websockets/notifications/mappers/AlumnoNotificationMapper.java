@@ -1,7 +1,7 @@
 package es.nicolas.websockets.notifications.mappers;
 
 
-import es.nicolas.alumnos.models.Alumno;
+import es.nicolas.rest.alumnos.models.Alumno;
 import es.nicolas.websockets.notifications.dto.AlumnoNotificationResponse;
 import org.springframework.stereotype.Component;
 

@@ -1,9 +1,10 @@
 package es.nicolas.alumnos.mappers;
 
-import es.nicolas.alumnos.dto.AlumnoCreateDto;
-import es.nicolas.alumnos.dto.AlumnoUpdateDto;
-import es.nicolas.alumnos.models.Alumno;
-import es.nicolas.asignaturas.models.Asignatura;
+import es.nicolas.rest.alumnos.dto.AlumnoCreateDto;
+import es.nicolas.rest.alumnos.dto.AlumnoUpdateDto;
+import es.nicolas.rest.alumnos.mappers.AlumnoMapper;
+import es.nicolas.rest.alumnos.models.Alumno;
+import es.nicolas.rest.asignaturas.models.Asignatura;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package es.nicolas.config.auth;
 
-import es.nicolas.auth.services.jwt.JwtService;
-import es.nicolas.auth.services.users.AuthUsersService;
+import es.nicolas.rest.auth.services.jwt.JwtService;
+import es.nicolas.rest.auth.services.users.AuthUsersService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

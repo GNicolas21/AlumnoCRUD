@@ -1,0 +1,31 @@
+package es.nicolas.rest.asignaturas.repositories;
+
+import es.nicolas.rest.asignaturas.models.Asignatura;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.*;
+
+public interface AsignaturasRespository extends JpaRepository<Asignatura, Long>, JpaSpecificationExecutor<Asignatura> {
+
+    // Encontrar por nombre
+    Optional<Asignatura> findByNombreEqualsIgnoreCase(String nombre);
+
+
+    // Lista de asignaturas por nombre
+    List<Asignatura> findByNombreContainsIgnoreCase(String nombre);
+
+
+    // Actualizar la asignatura con isDeleted a true
+    // Usar @Modifying y @Query en el servicio
+    @Modifying
+    @Query("update Asignatura a set a.isDeleted=true where a.id =:id")
+    void updateIsDeletedToTrueById(Long id);
+
+    // obtiene si existe una asignatura con id del alumno
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Alumno a where a.asignatura.id =:id")
+    Boolean existsByAlumnoById(Long id);
+
+}

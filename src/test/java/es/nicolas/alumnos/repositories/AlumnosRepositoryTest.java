@@ -1,7 +1,8 @@
 package es.nicolas.alumnos.repositories;
 
-import es.nicolas.alumnos.models.Alumno;
-import es.nicolas.asignaturas.models.Asignatura;
+import es.nicolas.rest.alumnos.models.Alumno;
+import es.nicolas.rest.alumnos.repositories.AlumnosRepository;
+import es.nicolas.rest.asignaturas.models.Asignatura;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
