@@ -1,0 +1,76 @@
+# ==========================================================================
+# ESQUEMA GRAPHQL PARA ALUMNO Y ASIGNATURA
+# ==========================================================================
+# Este esquema permite consultar alumnos con su asignatura y asignaturas
+# con sus alumnos. Es un ejemplo educativo de como estructurar GraphQL.
+#
+# QUE ES UN ESQUEMA GRAPHQL:
+# Un esquema GraphQL define formalmente los tipos de datos, consultas y
+# mutaciones que una API puede manejar. Es el contrato entre cliente y servidor.
+#
+# COMPONENTES CLAVE:
+# 1. Tipos (Types): Define objetos, listas, escalares (String, Int, Float, Boolean, ID)
+# 2. Consultas (Queries): Operaciones de lectura para obtener datos
+# 3. Mutaciones (Mutations): Operaciones de escritura para modificar datos
+# 4. Suscripciones (Subscriptions): Actualizaciones en tiempo real
+# 5. Relaciones: Como se conectan los diferentes tipos entre si
+#
+# NOTACIÓN BÁSICA:
+# - Los tipos se definen con 'type NombreTipo { campos }'
+# - Los campos se definen como 'nombre: Tipo'
+# - Tipos escalares: String, Int, Float, Boolean, ID
+# - Campo obligatorio: 'nombre: String!' (no puede ser nulo)
+# - Campo opcional: 'nombre: String' (puede ser nulo)
+# - Lista: '[String!]!' = lista no nula de strings no nulos
+# - Lista opcional: '[String]' = lista que puede ser nula con elementos que pueden ser nulos
+# - Comentarios de linea: # (como este)
+# - Las queries van en el tipo 'Query', las mutations en 'Mutation'
+#
+# EJEMPLO DE NOTACION:
+# tarjetas: [Tarjeta!]! significa:
+# - El campo se llama 'tarjetas'
+# - Es una lista (corchetes [])
+# - Contiene elementos del tipo 'Tarjeta'
+# - Cada elemento es obligatorio (Tarjeta!)
+# - La lista en si es obligatoria (!al final)
+# ==========================================================================
+
+# --- CONSULTAS DISPONIBLES ---
+# Operaciones de lectura para clientes
+type Query {
+    # Obtener una lista de todos los alumnos
+    alumnos: [Alumno!]!
+
+    # Busca y devuelve un alumno por su ID, si no existe devuelve null
+    alumnoById(id: ID!): Alumno
+
+    # Devuelve una lista de todas las asignaturas
+    asignaturas: [Asignatura!]!
+
+    # Busca y devuelve una asignatura por su ID, si no existe devuelve null
+    asignaturaById(id: ID!): Asignatura
+
+    # Busca y devuelve una lista de asignaturas por el nombre
+    asignaturasByNombre(nombre: String!): [Asignatura!]!
+}
+
+# --- TIPO ALUMNO ---
+# Representa un alumno con todos sus atributos y relaciones
+type Alumno {
+    id: ID!                 # Identificador unico del alumno
+    nombre: String!         # Nombre del alumno
+    apellidos: String!      # Apellidos del alumno
+    grado: String!          # Grado del alumno
+    edad: Int!              # Edad del alumno
+    uuid: String!           # Identificador UUID unico del alumno (para APIs externas)
+    createdAt: String!      # Fecha de creacion del registro
+    updatedAt: String!      # Fecha de ultima actualizacion del registro
+    isDeleted : Boolean!    # Indicador de si el registro esta eliminado
+    asignatura: Asignatura! # Asignatura asociada al alumno
+}
+# --- TIPO ASIGNATURA ---
+# Representa una asignatura de los alumnos con sus atributos
+type Asignatura {
+    id: ID!                # Identificador unico de la asignatura
+    nombre: String!        # Nombre de la asignatura
+}

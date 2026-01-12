@@ -41,7 +41,7 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        String[] apiPaths = {"/api/**", "/error/**", "/ws/**"};
+        String[] apiPaths = {"/api/**", "/error/**", "/ws/**", "/graphql", "/graphiql", "/graphiql/**"};
         http
             .securityMatcher(apiPaths)
             // Podemos decir que forzamos el uso de HTTPS, para todas las peticiones, devuelve
