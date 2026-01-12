@@ -1,6 +1,7 @@
 package es.nicolas.rest.alumnos.repositories;
 
 import es.nicolas.rest.alumnos.models.Alumno;
+import es.nicolas.rest.asignaturas.models.Asignatura;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -52,4 +53,7 @@ public interface AlumnosRepository extends JpaRepository<Alumno, Long>, JpaSpeci
     Boolean existsByUsuarioId(Long id);
 
     Object findByNombreEqualsIgnoreCase(String nombre);
+
+    // Añadido para consulta GraphQL
+    List<Alumno> findByAsignatura(Asignatura asignatura);
 }

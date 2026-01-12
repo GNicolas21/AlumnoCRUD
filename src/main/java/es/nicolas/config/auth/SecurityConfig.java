@@ -62,6 +62,9 @@ public class SecurityConfig {
                     // Websockets para notificaciones
                     .requestMatchers("/ws/**").permitAll()
 
+                    // graphql
+                    .requestMatchers("/graphql", "/graphiql", "/graphiql/**").permitAll()
+
                     // Otras rutas de la API, podemos permitirlas o no...
                     .requestMatchers("/api/" + apiVersion + "/**").permitAll()
                     // Podríamos jugar con permisos, por ejemplo para una ruta concreta

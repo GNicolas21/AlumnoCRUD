@@ -59,18 +59,84 @@ type Query {
 type Alumno {
     id: ID!                 # Identificador unico del alumno
     nombre: String!         # Nombre del alumno
-    apellidos: String!      # Apellidos del alumno
+    apellido: String!      # Apellidos del alumno
     grado: String!          # Grado del alumno
-    edad: Int!              # Edad del alumno
     uuid: String!           # Identificador UUID unico del alumno (para APIs externas)
     createdAt: String!      # Fecha de creacion del registro
     updatedAt: String!      # Fecha de ultima actualizacion del registro
-    isDeleted : Boolean!    # Indicador de si el registro esta eliminado
+    isDeleted: Boolean!     #Indicador de si el registro esta eliminado
     asignatura: Asignatura! # Asignatura asociada al alumno
 }
 # --- TIPO ASIGNATURA ---
 # Representa una asignatura de los alumnos con sus atributos
 type Asignatura {
-    id: ID!                # Identificador unico de la asignatura
-    nombre: String!        # Nombre de la asignatura
+    id: ID!                 # Identificador unico de la asignatura
+    nombre: String!         # Nombre de la asignatura
+    createdAt: String!      # Fecha de creacion del registro
+    updatedAt: String!      # Fecha de ultima actualizacion del registro
+    isDeleted: Boolean!     # Indicador de si el registro esta eliminado
+    alumnos: [Alumno!]!     # Lista de alumnos inscritos en la asignatura
 }
+
+# ==========================================================================
+# EJEMPLOS DE CONSULTAS PARA EL ALUMNADO:
+# ==========================================================================
+
+# 1. Obtener todos los alumnos con su asignatura
+# query {
+#   alumnos {
+#     id
+#     nombre
+#     apellidos
+#     grado
+#     asignatura {
+#       id
+#       nombre
+#     }
+#   }
+# }
+
+# 2. Obtener un alumno específico por ID
+# query {
+#   alumnoById(id: "1") {
+#     nombre
+#     apellidos
+#     grado
+#     asignatura {
+#       nombre
+#     }
+#   }
+# }
+#
+# 3. Obtener una asignatura con todos sus alumnos
+# query {
+#   asignaturaById(id: "id-del-alumno") {
+#     nombre
+#     alumnos {
+#       id
+#       nombre
+#       apellidos
+#       grado
+#     }
+#   }
+# }
+#
+# 4. Obtener solo nombres de alumnos y asignaturas
+#
+# query {
+#   alumnos {
+#     nombre
+#     apellidos
+#     asignatura {
+#       nombre
+#     }
+#   }
+# }
+#
+# IMPORTANTE:
+# - En GraphQL solo obtienes los campos que pides explicítamente en la consulta.
+# - Puedes anidar relaciones (alumnos -> asignatura -> alumnos -> ...)
+# - El servidor valida automáticamente que las queries cumplan con el esquema
+# - Puedes ampliar con Mutations para crear/actualizar/eliminar datos
+# - Podemos añadir paginación, filtros y ordenamientos según necesidades a las listas
+# ==========================================================================

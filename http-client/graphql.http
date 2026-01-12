@@ -1,0 +1,53 @@
+### Todos los alumnos
+GRAPHQL http://localhost:3000/graphql
+
+query {
+  alumnos {
+    id
+    nombre
+    apellido
+    grado
+    asignatura {
+        id
+        nombre
+    }
+  }
+}
+
+
+### Alumno por ID
+GRAPHQL http://localhost:3000/graphql
+
+query {
+    alumnoById(id: "1") {
+        nombre
+        apellido
+        grado
+        asignatura {
+            nombre
+        }
+    }
+}
+
+### Todas las ASIGNATURAS
+GRAPHQL http://localhost:3000/graphql
+
+query {
+    asignaturas {
+        id
+        nombre
+    }
+}
+
+### Solo datos principales de los alumnos y asignaturas
+GRAPHQL http://localhost:3000/graphql
+
+query {
+    alumnos {
+        nombre
+        apellido
+        asignatura {
+            nombre
+        }
+    }
+}
