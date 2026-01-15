@@ -18,13 +18,29 @@ insert into asignaturas (nombre)
 values ('Programacion'), ( 'Base Datos'), ('Lenguaje de Marcas');
 
 insert into alumnos (nombre, apellido, grado,asignatura_id, uuid)
-    values ('Bart', 'Benavente', '8 DAM', '1', UUID());
+    values ('Bart', 'Benavente', '1 DAM', '1', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
     values ('Nicolas', 'Osorio', '2 DAW', '1', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
     values ('Cesar', 'Campos', '3 DAW','2', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
     values ('Dani', 'Delgado', '4 ASIR', '3', UUID());
+
+-- Datos para probar paginación
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Laura', 'Bull', '4 ASIR', '3', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Jorge', 'Mortis', '3 DAW', '3', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Atom', 'Silencer', '2 DAM', '3', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Gush', 'Mortred', '3 DAW', '3', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Nita', 'Abbadon', '1 DAM', '3', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Shelly', 'Juggernaut', '1 ASIR', '3', UUID());
+insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
+values ('Darryl', 'Doomsday', '3 DAW', '3', UUID());
 
 -- Datos de ejemplo USUARIOS
 -- Contraseña: Admin1

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
 
@@ -21,11 +22,13 @@ public class ZonaPublicaController {
     private final AlumnosService alumnosService;
 
     @GetMapping({"", "/", "/index"})
-    public String index(Model model) {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+    public String index(Model model,
+                        @RequestParam(name = "page", defaultValue = "0") int page,
+                        @RequestParam(name = "size", defaultValue = "4") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<AlumnoResponseDto> alumnosPage = alumnosService.findAll(
                 Optional.empty(), Optional.empty(), Optional.empty(), pageable);
-        model.addAttribute("tarjetas", alumnosPage);
+        model.addAttribute("page", alumnosPage);
         return "index";
     }
 }
