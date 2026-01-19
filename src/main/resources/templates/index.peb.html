@@ -29,7 +29,7 @@
             <td>{{ alumno.apellido }}</td>
             <td>{{ alumno.grado }}</td>
             <td>{{ alumno.asignatura }}</td>
-            <td>{{ alumno.xd }}</td>
+            <td><a href="alumnos/{{ alumno.id }}">Ver detalles</a> </td>
         </tr>
         {% endfor %}
     </table>
@@ -62,7 +62,7 @@
                     {% endif %}
 
                     <!-- Números de página -->
-                    {% for i in range(0, page.totalPages) %}
+                    {% for i in range(0, page.totalPages - 1) %}
                     {% if i == page.number %}
                     <li class="page-item active">
                         <span class="page-link">{{ i + 1 }}</span>
@@ -94,7 +94,6 @@
         </div>
     </nav>
     {% endif %}
-
 
     {% endif %}
 </div>

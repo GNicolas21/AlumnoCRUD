@@ -12,10 +12,12 @@
         <i class="bi bi-info-circle"></i> No se han encontrado alumnos.
     </div>
     {% else %}
-    <h2> Detalle del alumno {{ alumno.id }}</h2>
+    <h3> Detalle del alumno {{ alumno.id }}</h3>
     <ul>
         <li> Nombre: {{ alumno.nombre }}</li>
+        <li> Apellido: {{ alumno.apellido }}</li>
         <li> Grado: {{ alumno.grado }}</li>
+        <li> Asignatura: {{ alumno.asignatura }}</li>
     </ul>
     {% endif %}
 </div>

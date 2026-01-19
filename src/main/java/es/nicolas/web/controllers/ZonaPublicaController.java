@@ -28,7 +28,7 @@ public class ZonaPublicaController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<AlumnoResponseDto> alumnosPage = alumnosService.findAll(
                 Optional.empty(), Optional.empty(), Optional.empty(), pageable);
-        model.addAttribute("tarjetas", alumnosPage);
+        model.addAttribute("page", alumnosPage);
         return "index";
     }
 }
