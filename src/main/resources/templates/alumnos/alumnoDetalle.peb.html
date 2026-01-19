@@ -3,21 +3,22 @@
 {% include "fragments/head" %}
 
 <body class="d-flex flex-column min-vh-100">
+{% include "fragments/navbar" %}
 
 <div class="container mb-5">
 
     <!-- Lista de Alumnos -->
     {% if alumno is empty %}
     <div class="alert alert-info text-center">
-        <i class="bi bi-info-circle"></i> No se han encontrado alumnos.
+        <i class="bi bi-info-circle"></i> {{ message('label.alumno.empty') }}
     </div>
     {% else %}
     <h3> Detalle del alumno {{ alumno.id }}</h3>
     <ul>
-        <li> Nombre: {{ alumno.nombre }}</li>
-        <li> Apellido: {{ alumno.apellido }}</li>
-        <li> Grado: {{ alumno.grado }}</li>
-        <li> Asignatura: {{ alumno.asignatura }}</li>
+        <li> {{ message('label.alumno.nombre') }}: {{ alumno.nombre }}</li>
+        <li> {{ message('label.alumno.apellido') }}: {{ alumno.apellido }}</li>
+        <li> {{ message('label.alumno.grado') }}: {{ alumno.grado }}</li>
+        <li> {{ message('label.alumno.asignatura') }}: {{ alumno.asignatura }}</li>
     </ul>
     {% endif %}
 </div>
