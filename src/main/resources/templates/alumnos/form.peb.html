@@ -7,23 +7,23 @@
 <h2 class="mt-5">{% if alumnos['new'] %}Nueva {% endif %} Alumno</h2>
 <form class="form-horizontal" id="add-alumno-form" method="post"
       action="{% if modoEditar %}/alumnos/{{alumnoId}}/edit{% else %}/alumnos/new{% endif %}">
-    <input name="{{ csrfParamName }}" type="hidden" value="{{ csrfToken }}">
-    <div class="form-group has-feedback">
-        <input type="hidden" id="id" name="id" value="{{ alumno.id | default(0) }}">
-        {{ inputField("alumno", "Nombre", "nombre", "text", alumno.nombre, _context) }}
-        {{ inputField("alumno", "Apellido", "apellido", "text", alumno.apellido, _context) }}
-        {{ inputField("alumno", "Grado", "grado", "text", alumno.grado, _context) }}
-        {% if not modoEditar %}
-        {{ inputField("alumno", "Asignatura", "asignatura", "text", alumno.asignatura, _context) }}
-        {% endif %}
+  <input name="{{ csrfParamName }}" type="hidden" value="{{ csrfToken }}">
+  <div class="form-group has-feedback">
+    <input type="hidden" id="id" name="id" value="{{ alumno.id | default(0) }}">
+    {{ inputField("alumno", "Nombre", "nombre", "text", alumno.nombre, _context) }}
+    {{ inputField("alumno", "Apellido", "apellido", "text", alumno.apellido, _context) }}
+    {{ inputField("alumno", "Grado", "grado", "text", alumno.grado, _context) }}
+    {% if not modoEditar %}
+    {{ inputField("alumno", "Asignatura", "asignatura", "text", alumno.asignatura, _context) }}
+    {% endif %}
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button
+        class="btn btn-primary" type="submit">{{ modoEditar ? 'Actualizar Alumno' : 'Añadir Alumno' }}
+      </button>
     </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button
-                    class="btn btn-primary" type="submit">{{ modoEditar ? 'Actualizar Alumno' : 'Añadir Alumno' }}
-            </button>
-        </div>
-    </div>
+  </div>
 </form>
 
 {% endblock %}
