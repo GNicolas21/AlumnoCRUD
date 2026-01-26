@@ -64,7 +64,7 @@ public class AlumnosController {
         }
     }
 
-    @GetMapping("{id}/edit")
+    @GetMapping("/{id}/edit")
     public String editarAlumnoForm(@PathVariable Long id, Model model) {
         AlumnoResponseDto alumno = alumnosService.findById(id);
         if (alumno == null) {
@@ -84,7 +84,7 @@ public class AlumnosController {
     }
 
 
-    @PostMapping("{id}/edit")
+    @PostMapping("/{id}/edit")
     public String editarAlumnoSubmit(@PathVariable Long id,
                                      @Valid @ModelAttribute("alumno") AlumnoUpdateDto alumno,
                                      BindingResult bindingResult,
@@ -101,4 +101,12 @@ public class AlumnosController {
         redirectAttributes.addFlashAttribute("message", "Alumno modificado exitosamente.");
         return "redirect:/alumnos/{id}";
     }
+
+    @GetMapping("/{id}/delete")
+    public String borrarAlumno(@PathVariable Long id) {
+        // TO DO Borrar con confirmación mediante ventana modal
+        alumnosService.deleteById(id);
+        return "redirect:/alumnos/lista";
+    }
+
 }
