@@ -44,7 +44,7 @@ values ('Darryl', 'Doomsday', '3 DAW', '3', UUID());
 
 -- Datos de ejemplo USUARIOS
 -- Contraseña: Admin1
--- No está asociado a ningún titulaar
+-- No está asociado a ningún titular(asignatura)
 insert into USUARIOS (nombre, apellidos, username, email, password)
     values ('Admin', 'Apellidadmin', 'admin', 'admin@prueba.net',
         '$2a$10$vPaqZvZkz6jhb7U7k/V/v.5vprfNdOnh4sxi/qpPRkYTzPmFlI9p2');
