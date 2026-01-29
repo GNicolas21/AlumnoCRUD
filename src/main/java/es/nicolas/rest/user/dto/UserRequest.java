@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequest {
+public class  UserRequest {
     @NotBlank(message = "Nombre no puede estar vacío")
     private String nombre;
 

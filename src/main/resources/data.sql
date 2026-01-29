@@ -15,7 +15,7 @@ create table ALUMNOS (
 */
 
 insert into asignaturas (nombre)
-values ('Programacion'), ( 'Base Datos'), ('Lenguaje de Marcas');
+values ('Programacion'), ( 'Base de Datos'), ('Lenguaje de Marcas');
 
 insert into alumnos (nombre, apellido, grado,asignatura_id, uuid)
     values ('Bart', 'Benavente', '1 DAM', '1', UUID());
@@ -28,23 +28,19 @@ insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
 
 -- Datos para probar paginación
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-values ('Laura', 'Bull', '4 ASIR', '3', UUID());
+values ('Laura', 'Bull', '4 ASIR', '2', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-values ('Jorge', 'Mortis', '3 DAW', '3', UUID());
+values ('Jorge', 'Mortis', '3 DAW', '2', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-values ('Atom', 'Silencer', '2 DAM', '3', UUID());
+values ('Atom', 'Silencer', '2 DAM', '2', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-values ('Gush', 'Mortred', '3 DAW', '3', UUID());
+values ('Gush', 'Mortred', '3 DAW', '2', UUID());
 insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
 values ('Nita', 'Abbadon', '1 DAM', '3', UUID());
-insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-values ('Shelly', 'Juggernaut', '1 ASIR', '3', UUID());
-insert into alumnos (nombre, apellido, grado, asignatura_id, uuid)
-values ('Darryl', 'Doomsday', '3 DAW', '3', UUID());
+
 
 -- Datos de ejemplo USUARIOS
--- Contraseña: Admin1
--- No está asociado a ningún titular(asignatura)
+-- Contraseña: Admin1 // No está asociado a ninguna asignatura
 insert into USUARIOS (nombre, apellidos, username, email, password)
     values ('Admin', 'Apellidadmin', 'admin', 'admin@prueba.net',
         '$2a$10$vPaqZvZkz6jhb7U7k/V/v.5vprfNdOnh4sxi/qpPRkYTzPmFlI9p2');
@@ -54,17 +50,18 @@ insert into user_roles (user_id, roles)
 insert into user_roles (user_id, roles)
     values (1, 'USER');
 
--- Contraseña: User1
-insert into USUARIOS (nombre, apellidos, username, email, password, titular_id)
-    values ('User', 'Apelliduser', 'user', 'user#prueba.net',
-        '$2a$10$e0MYzXyjpJS7Pd0RVvHwHeFX5cpA8AW8LZyWzUAnmK0jWAbHjg5eW', 2);
-insert into user_roles (user_id, roles)
+
+-- Contraseña: User1 // Base de Datos
+insert into USUARIOS (nombre, apellidos, username, email, password, asignatura_id)
+    values ('Campo_nombre', 'Campo_apellido', 'user', 'user@prueba.net',
+        '$2a$12$RUq2ScW1Kiizu5K4gKoK4OTz80.DWaruhdyfi2lZCB.KeuXTBh0S.', 2);
+insert into USER_ROLES (user_id, roles)
     values (2, 'USER');
 
 
--- Contraseña: Test1
-insert into USUARIOS (nombre, apellidos, username, email, password)
-values ('Test', 'Test Test', 'test', 'test@prueba.net',
-        '$2a$10$Pd1yyq2NowcsDf4Cpf/ZXObYFkcycswqHAqBndE1wWJvYwRxlb.Pu');
+-- Contraseña: Test1 // Lenguaje de Marcas
+insert into USUARIOS (nombre, apellidos, username, email, password, asignatura_id)
+values ('NTest', 'ATest', 'test', 'test@prueba.net',
+        '$2a$10$Pd1yyq2NowcsDf4Cpf/ZXObYFkcycswqHAqBndE1wWJvYwRxlb.Pu', 3);
 insert into USER_ROLES (user_id, roles)
-values (2, 'USER');
+values (3, 'ADMIN');

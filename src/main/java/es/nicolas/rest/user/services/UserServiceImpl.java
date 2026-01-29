@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService{
     private final UsersMapper usersMapper;
     private final AlumnosRepository alumnosRepository;
 
-    @Override
+  @Override
     public Page<UserResponse> findAll(Optional<String> username, Optional<String> email, Optional<Boolean> isDeleted, Pageable pageable) {
         log.info("Bucando todos los usuarios con username : {} y borrados: {}", username, isDeleted);
         // Criterio de búsqueda por nombre

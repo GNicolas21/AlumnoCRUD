@@ -61,7 +61,7 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     @OneToOne
-    @JoinColumn(name = "titular_id")
+    @JoinColumn(name = "asignatura_id")
     private Asignatura asignatura;
 
     @Override
