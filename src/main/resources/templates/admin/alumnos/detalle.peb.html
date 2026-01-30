@@ -1,0 +1,20 @@
+{% extends "fragments/layout" %}
+
+{% block body %}
+
+<!-- Lista de Alumnos -->
+{% if alumno is empty %}
+<div class="mt-5 alert alert-info text-center">
+  <i class="bi bi-info-circle"></i> {{ message('label.alumno.empty') }}
+</div>
+{% else %}
+<h3 class="mt-5"> Detalle del alumno {{ alumno.id }}</h3>
+<ul>
+  <li> {{ message('label.alumno.nombre') }}: {{ alumno.nombre }}</li>
+  <li> {{ message('label.alumno.apellido') }}: {{ alumno.apellido }}</li>
+  <li> {{ message('label.alumno.grado') }}: {{ alumno.grado }}</li>
+  <li> {{ message('label.alumno.asignatura') }}: {{ alumno.asignatura.nombre }}</li>
+</ul>
+{% endif %}
+
+{% endblock %}

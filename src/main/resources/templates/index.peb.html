@@ -11,8 +11,11 @@
     <h1 class="display-4">Saludos, visitante</h1>
     {% endif %}
     <p class="text-center">
-      <a class="btn btn-lg btn-success" href="/alumnos/lista">Comenzar</a>
-    </p>
+      {% if isAdmin %}
+      <a class="btn btn-lg btn-primary" href="/admin/alumnos">Ir al Panel de Administración</a>
+      {% else %}
+      <a class="btn btn-lg btn-success" href="/app/misalumnos">Comenzar</a>
+      {% endif %}    </p>
   </div>
 </div>
 

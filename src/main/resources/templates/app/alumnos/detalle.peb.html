@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<!-- Lista de Alumnos -->
+<!-- Lista de Tarjetas -->
 {% if alumno is empty %}
 <div class="mt-5 alert alert-info text-center">
   <i class="bi bi-info-circle"></i> {{ message('label.alumno.empty') }}
@@ -13,7 +13,7 @@
   <li> {{ message('label.alumno.nombre') }}: {{ alumno.nombre }}</li>
   <li> {{ message('label.alumno.apellido') }}: {{ alumno.apellido }}</li>
   <li> {{ message('label.alumno.grado') }}: {{ alumno.grado }}</li>
-  <li> {{ message('label.alumno.asignatura') }}: {{ alumno.asignatura }}</li>
+  <li> {{ message('label.alumno.asignatura') }}: {{ alumno.asignatura.nombre }}</li>
 </ul>
 {% endif %}
 

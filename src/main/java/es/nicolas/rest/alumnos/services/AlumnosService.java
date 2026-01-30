@@ -3,9 +3,11 @@ package es.nicolas.rest.alumnos.services;
 import es.nicolas.rest.alumnos.dto.AlumnoCreateDto;
 import es.nicolas.rest.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.rest.alumnos.dto.AlumnoUpdateDto;
+import es.nicolas.rest.alumnos.models.Alumno;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AlumnosService {
@@ -27,5 +29,9 @@ public interface AlumnosService {
 
     void deleteById(Long id);
     void deleteById(Long id, Long usuarioId);
+
+    // Servicios para webapp
+    List<Alumno> buscarPorUsuarioId(Long usuarioId);
+    Optional<Alumno> buscarPorId(Long id);
 
 }

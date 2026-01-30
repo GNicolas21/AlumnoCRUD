@@ -6,7 +6,7 @@
 
 <h2 class="mt-5">{% if alumnos['new'] %}Nueva {% endif %} Alumno</h2>
 <form class="form-horizontal" id="add-alumno-form" method="post"
-      action="{% if modoEditar %}/alumnos/{{alumnoId}}/edit{% else %}/alumnos/new{% endif %}">
+      action="{% if modoEditar %}/admin/alumnos/{{alumnoId}}/edit{% else %}/admin/alumnos/new{% endif %}">
   <input name="{{ csrfParamName }}" type="hidden" value="{{ csrfToken }}">
   <div class="form-group has-feedback">
     <input type="hidden" id="id" name="id" value="{{ alumno.id | default(0) }}">

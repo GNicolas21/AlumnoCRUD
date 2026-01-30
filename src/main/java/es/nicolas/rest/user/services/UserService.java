@@ -23,6 +23,7 @@ public interface UserService {
 
     List<User> findAllActiveUsers();
 
+    // Servicios para webapp
     Optional<User> findByUsername(String username);
 
     void save(User user);

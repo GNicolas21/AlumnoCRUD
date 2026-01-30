@@ -269,4 +269,14 @@ public class AlumnosServiceImpl implements AlumnosService, InitializingBean {
             log.error("Error al convertir la notificación a JSON", e);
         }
     }
+
+  @Override
+  public List<Alumno> buscarPorUsuarioId(Long usuarioId) {
+    return alumnosRepository.findByUsuarioId(usuarioId);
+  }
+
+  @Override
+  public Optional<Alumno> buscarPorId(Long id) {
+    return alumnosRepository.findById(id);
+  }
 }
