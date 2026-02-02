@@ -2,13 +2,19 @@
 
 {% block body %}
 
+<div class="row mb-4">
+  <div class="col-md-12">
+    {% include "fragments/messages" %}
+  </div>
+</div>
+
 <!-- Lista de Tarjetas -->
 {% if page is empty %}
 <div class="alert alert-info text-center">
   <i class="bi bi-info-circle"></i> No se han encontrado alumnos
 </div>
 {% else %}
-<table class="mt-5 table table-striped">
+<table class="mt-5 table table-striped" id="listaAlumnos">
   <tr>
     <th>ID</th>
     <th>Nombre</th>
@@ -18,14 +24,14 @@
   </tr>
   {% for alumno in page.content %}
   <tr>
-    <td>{{ alumno.id }}</td>
+    <td class="alumnoId">{{ alumno.id }}</td>
     <td>{{ alumno.nombre }}</td>
     <td>{{ alumno.apellido }}</td>
     <td>{{ alumno.grado }}</td>
     <td>
-      <a href="/admin/alumnos/{{ alumno.id }}">Ver detalle</a>
+      <a href="/admin/alumnos/{{ alumno.id }}"><i class="bi bi-eye"></i></a>
       <a href="/admin/alumnos/{{ alumno.id }}/edit"><i class="bi bi-pencil"></i></a>
-      <a href="/admin/alumnos/{{ alumno.id }}/delete"><i class="bi bi-trash"></i></a>
+      <a class="borrarAlumnoLink" href="#"><i class="bi bi-trash"></i></a>
     </td>
   </tr>
   {% endfor %}
@@ -93,4 +99,13 @@
 {% endif %}
 
 {% endif %}
+
+<!-- div para el modal -->
+<div id="placeholder-modal"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ href('/js/app-lista.js') }}"></script>
+
 {% endblock %}

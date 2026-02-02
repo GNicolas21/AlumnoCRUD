@@ -5,6 +5,8 @@ import es.nicolas.rest.alumnos.dto.AlumnoResponseDto;
 import es.nicolas.rest.alumnos.dto.AlumnoUpdateDto;
 import es.nicolas.rest.alumnos.models.Alumno;
 import es.nicolas.rest.alumnos.services.AlumnosService;
+import es.nicolas.web.services.I18nService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ import java.util.Optional;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
   private final AlumnosService alumnosService;
+  private final I18nService i18nService;
 
   @GetMapping("/alumnos")
   public String alumnos(Model model,
@@ -102,14 +106,51 @@ public class AdminController {
       return "admin/alumnos/form";
     }
     alumnosService.update(id, alumnoUpdateDto);
-    redirectAttributes.addFlashAttribute("message", "Alumno actualizado correctamente.");
+    redirectAttributes.addFlashAttribute("success", "Alumno actualizado correctamente.");
     return "redirect:/admin/alumnos/{id}";
   }
 
-  @GetMapping("/alumnos/{id}/delete")
-  public String borrarAlumno(@PathVariable Long id) {
+  // ahora requiere POST y un token de confirmación almacenado en sesión
+  @PostMapping("/alumnos/{id}/delete")
+  public String borrarAlumno(@PathVariable Long id,
+                             @RequestParam("deleteToken") String deleteToken,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+    String sessionKey = "deleteToken_" + id;
+    String tokenInSession = (String) session.getAttribute(sessionKey);
+
+    if (tokenInSession == null ||  !tokenInSession.equals(deleteToken)) {
+      redirectAttributes.addFlashAttribute("error", "Confirmación inválida o caducada.");
+      return "redirect:/admin/alumnos";
+    }
+    session.removeAttribute(sessionKey);
     alumnosService.deleteById(id);
+    redirectAttributes.addFlashAttribute("success", "Alumno eliminado correctamente.");
     return "redirect:/admin/alumnos";
+  }
+
+  @GetMapping("/alumnos/{id}/delete/confirm")
+  public String showModalBorrar(@PathVariable("id") Long id, Model model, HttpSession session) {
+    Optional<Alumno> alumno = alumnosService.buscarPorId(id);
+    String deleteMessage;
+    if (alumno.isPresent()) {
+      deleteMessage = i18nService.getMessage("alumnos.borrar.mensaje",
+        new Object[]{alumno.get().getNombre()});
+    }else {
+      return "redirect:/alumnos/?error=true";
+    }
+    // generar token de un solo uso y guardarlo en sesión
+    String token = UUID.randomUUID().toString();
+    String sessionKey = "deleteToken_" + id;
+    session.setAttribute(sessionKey, token);
+
+    model.addAttribute("deleteUrl", "/admin/alumnos/" + id + "/delete");
+    model.addAttribute("deleteToken", token);
+    model.addAttribute("deleteTitle",
+      i18nService.getMessage("alumnos.borrar.titulo")
+    );
+    model.addAttribute("deleteMessage", deleteMessage);
+    return "fragments/deleteModal";
   }
 
 }
