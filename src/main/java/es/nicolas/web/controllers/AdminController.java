@@ -44,6 +44,19 @@ public class AdminController {
     return "admin/alumnos/lista";
   }
 
+  @GetMapping("/alumnos/filter")
+  public String alumnosFiltrar(Model model,
+                               @RequestParam(required = false) Optional<String> nombre,
+                               @RequestParam(name = "page", defaultValue = "0") int page,
+                               @RequestParam(name = "size", defaultValue = "4") int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+    Page<AlumnoResponseDto> alumnosPage = alumnosService.findAll(
+      nombre, Optional.empty(), Optional.empty(), pageable
+    );
+    model.addAttribute("page", alumnosPage);
+    return "fragments/listaAlumnos";
+  }
+
   @GetMapping("/alumnos/{id}")
   public String getById(@PathVariable Long id, Model model) {
     var alumno = alumnosService.buscarPorId(id).orElse(null);

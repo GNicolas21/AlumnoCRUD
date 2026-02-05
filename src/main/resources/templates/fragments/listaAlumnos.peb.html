@@ -1,0 +1,29 @@
+<!-- Lista de Tarjetas -->
+{% if page is empty %}
+<div class="alert alert-info text-center">
+  <i class="bi bi-info-circle"></i> No se han encontrado alumnos
+</div>
+{% else %}
+<table class="mt-5 table table-striped" id="listaAlumnos">
+  <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Apellido</th>
+    <th>Grado</th>
+    <th>Acciones</th>
+  </tr>
+  {% for alumno in page.content %}
+  <tr>
+    <td class="alumnoId">{{ alumno.id }}</td>
+    <td>{{ alumno.nombre }}</td>
+    <td>{{ alumno.apellido }}</td>
+    <td>{{ alumno.grado }}</td>
+    <td>
+      <a href="/admin/alumnos/{{ alumno.id }}"><i class="bi bi-eye"></i></a>
+      <a href="/admin/alumnos/{{ alumno.id }}/edit"><i class="bi bi-pencil"></i></a>
+      <a class="borrarAlumnoLink" href="#"><i class="bi bi-trash"></i></a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
