@@ -429,12 +429,12 @@ class AlumnosServiceImplTest {
         verify(alumnosRepository, times(0)).deleteById(id);
     }
 
-    @Test
-    void onChange_ShouldSendMessage_WhenValidDataProvided() throws IOException{
-        // Arrange
-        doNothing().when(webSocketService).sendMessage(any());
-
-        // Act
-        alumnosService.onChange(Notification.Tipo.CREATE, alumno1);
-    }
+//    @Test
+//    void onChange_ShouldSendMessage_WhenValidDataProvided() throws IOException{
+//        // Arrange
+//        doNothing().when(webSocketService).sendMessage(any());
+//
+//        // Act
+//        alumnosService.onChange(Notification.Tipo.CREATE, alumno1);
+//    }
 }

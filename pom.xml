@@ -36,6 +36,7 @@
         <bootstrap-icons.version>1.13.1</bootstrap-icons.version>
     </properties>
     <build>
+      <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

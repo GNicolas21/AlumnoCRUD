@@ -1,0 +1,9 @@
+name: AlumnosCRUD
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:3000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
